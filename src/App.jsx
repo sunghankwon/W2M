@@ -27,6 +27,14 @@ function App() {
     }
   };
 
+  const clearSelection = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setFileInfo({ name: "", icon: "" });
+    setLabelText("choose Word file");
+    document.getElementById("fileInput").value = "";
+  };
+
   const handleDragOver = (event) => {
     event.preventDefault();
   };
@@ -72,6 +80,12 @@ function App() {
                   className="w-20 h-20"
                 />
                 <span className="mt-2">{fileInfo.name}</span>
+                <div
+                  className="absolute top-2 right-0 cursor-pointer text-lg text-red-400 transform -translate-y-1/2 translate-x-1/2"
+                  onClick={clearSelection}
+                >
+                  &times;
+                </div>
               </div>
             ) : (
               <div className="relative flex flex-col items-center pt-4">
