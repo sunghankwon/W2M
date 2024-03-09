@@ -1,11 +1,10 @@
 import { useState } from "react";
 
-import w2mLogo from "./assets/w2mLogo.png";
-import docxImage from "./assets/docx.png";
-import markdownImage from "./assets/markdown.png";
-import fileSearchIcon from "./assets/file.png";
+import docxImage from "../../assets/docx.png";
+import markdownImage from "../../assets/markdown.png";
+import fileSearchIcon from "../../assets/file.png";
 
-function App() {
+function DocxUploader() {
   const [labelText, setLabelText] = useState("choose Word file");
   const [fileInfo, setFileInfo] = useState({ name: "", icon: "" });
 
@@ -46,20 +45,15 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col items-center w-full">
-      <div className="flex items-center mt-8 mb-10">
-        <img src={w2mLogo} alt="W2M Logo" className="w-20 h-20 mr-6" />
-        <h1 className="text-7xl font-bold">W2M</h1>
-      </div>
-
+    <>
       <div
-        className="w-11/12 mt-15 mb-4 flex flex-col items-center justify-center"
+        className="w-full max-w-none mt-10 mb-4 flex flex-col items-center justify-center"
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
         <label
           htmlFor="fileInput"
-          className="w-full flex justify-center items-center cursor-pointer"
+          className="w-11/12 flex justify-center items-center cursor-pointer"
         >
           <input
             type="file"
@@ -69,30 +63,30 @@ function App() {
             accept=".docx"
           />
           <div
-            className="w-full bg-gray-500 text-white flex flex-col items-center font-bold py-2 px-4 rounded-lg text-lg space-y-2 relative"
+            className="w-full bg-gray-500 text-white flex flex-col items-center justify-center font-bold py-3 px-4 rounded-lg text-lg sm:text-xl md:text-2xl space-y-2 relative"
             style={{ minHeight: "200px" }}
           >
             {fileInfo.name ? (
-              <div className="relative flex flex-col items-center pt-4">
+              <div className="relative flex flex-col items-center justify-center pt-4">
                 <img
                   src={fileInfo.icon}
                   alt="File icon"
-                  className="w-20 h-20"
+                  className="w-24 h-24 sm:w-28 sm:h-28"
                 />
                 <span className="mt-2">{fileInfo.name}</span>
                 <div
-                  className="absolute top-2 right-0 cursor-pointer text-lg text-red-400 transform -translate-y-1/2 translate-x-1/2"
+                  className="absolute top-0 right-0 cursor-pointer text-xl text-red-500 transform translate-y-1/2 translate-x-1/2"
                   onClick={clearSelection}
                 >
                   &times;
                 </div>
               </div>
             ) : (
-              <div className="relative flex flex-col items-center pt-4">
+              <div className="relative flex flex-col items-center justify-center pt-4">
                 <img
                   src={fileSearchIcon}
                   alt="file search icon"
-                  className="w-20 h-20 mb-2"
+                  className="w-24 h-24 sm:w-28 sm:h-28 mb-2"
                 />
               </div>
             )}
@@ -101,31 +95,35 @@ function App() {
         </label>
       </div>
 
-      <div className="flex flex-col items-center mt-10 mb-4">
+      <div className="flex flex-col items-center justify-center mt-10 mb-4">
         <div className="flex justify-center items-center space-x-4 mb-4">
           <div className="flex flex-col items-center">
-            <img src={docxImage} alt="DOCX file" className="w-40 h-40" />
-            <span className="text-xl">DOCX</span>
+            <img
+              src={docxImage}
+              alt="DOCX file"
+              className="w-48 h-48 sm:w-52 sm:h-52"
+            />
+            <span className="text-xl sm:text-2xl">DOCX</span>
           </div>
-          <span className="text-6xl">→</span>
+          <span className="text-6xl sm:text-7xl md:text-8xl">→</span>
           <div className="flex flex-col items-center">
             <img
               src={markdownImage}
               alt="Markdown file"
-              className="w-40 h-40"
+              className="w-48 h-48 sm:w-52 sm:h-52"
             />
-            <span className="text-xl">MD</span>
+            <span className="text-xl sm:text-2xl">MD</span>
           </div>
         </div>
         <button
-          className={`w-full text-4xl font-bold mt-10 py-2 px-4 rounded text-white ${fileInfo.name ? "bg-blue-500" : "bg-gray-400 cursor-not-allowed"}`}
+          className={`w-full text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mt-10 py-3 px-6 rounded text-white ${fileInfo.name ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-500 cursor-not-allowed"}`}
           disabled={!fileInfo.name}
         >
-          convert
+          Convert
         </button>
       </div>
-    </div>
+    </>
   );
 }
 
-export default App;
+export default DocxUploader;
