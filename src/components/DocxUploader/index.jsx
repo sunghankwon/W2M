@@ -1,12 +1,17 @@
 import { useState } from "react";
+import JSZip from "jszip";
+import { useNavigate } from "react-router-dom";
 
+import useDocxXmlStore from "../../store/useDocxXml";
 import docxImage from "../../assets/docx.png";
 import markdownImage from "../../assets/markdown.png";
 import fileSearchIcon from "../../assets/file.png";
 
 function DocxUploader() {
-  const [labelText, setLabelText] = useState("choose Word file");
-  const [fileInfo, setFileInfo] = useState({ name: "", icon: "" });
+  const [labelText, setLabelText] = useState("Choose Word file");
+  const [fileInfo, setFileInfo] = useState({ name: "", icon: "", file: null });
+  const { setDocxXmlData } = useDocxXmlStore();
+  const navigate = useNavigate();
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -18,19 +23,17 @@ function DocxUploader() {
       const fileExtension = file.name.split(".").pop().toLowerCase();
       if (fileExtension !== "docx") {
         setLabelText("Please insert a 'docx' file");
-        setFileInfo({ name: "", icon: "" });
+        setFileInfo({ name: "", icon: "", file: null });
       } else {
         setLabelText("File ready to convert");
-        setFileInfo({ name: file.name, icon: docxImage });
+        setFileInfo({ name: file.name, icon: docxImage, file: file });
       }
     }
   };
 
-  const clearSelection = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setFileInfo({ name: "", icon: "" });
-    setLabelText("choose Word file");
+  const clearSelection = () => {
+    setFileInfo({ name: "", icon: "", file: null });
+    setLabelText("Choose Word file");
     document.getElementById("fileInput").value = "";
   };
 
@@ -42,6 +45,19 @@ function DocxUploader() {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
     processFile(file);
+  };
+
+  const handleConvert = async () => {
+    if (fileInfo.file) {
+      try {
+        const zip = await JSZip.loadAsync(fileInfo.file);
+        const xmlData = await zip.file("word/document.xml").async("string");
+        setDocxXmlData(xmlData);
+        navigate("/convert-markdown");
+      } catch (error) {
+        console.error("Error extracting XML from DOCX:", error);
+      }
+    }
   };
 
   return (
@@ -67,7 +83,7 @@ function DocxUploader() {
             style={{ minHeight: "200px" }}
           >
             {fileInfo.name ? (
-              <div className="relative flex flex-col items-center justify-center pt-4">
+              <>
                 <img
                   src={fileInfo.icon}
                   alt="File icon"
@@ -80,17 +96,17 @@ function DocxUploader() {
                 >
                   &times;
                 </div>
-              </div>
+              </>
             ) : (
               <div className="relative flex flex-col items-center justify-center pt-4">
                 <img
                   src={fileSearchIcon}
-                  alt="file search icon"
+                  alt="File search icon"
                   className="w-24 h-24 sm:w-28 sm:h-28 mb-2"
                 />
+                <span>{labelText}</span>
               </div>
             )}
-            <span>{labelText}</span>
           </div>
         </label>
       </div>
@@ -116,8 +132,9 @@ function DocxUploader() {
           </div>
         </div>
         <button
-          className={`w-full text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mt-10 py-3 px-6 rounded text-white ${fileInfo.name ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-500 cursor-not-allowed"}`}
-          disabled={!fileInfo.name}
+          className={`w-full text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mt-10 py-3 px-6 rounded text-white ${fileInfo.file ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-500 cursor-not-allowed"}`}
+          onClick={handleConvert}
+          disabled={!fileInfo.file}
         >
           Convert
         </button>
