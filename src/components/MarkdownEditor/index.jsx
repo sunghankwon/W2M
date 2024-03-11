@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 
 import Preview from "../Preview";
 import useDocxXmlStore from "../../store/useDocxXml";
+import useFileNameStore from "../../store/useFileName";
 
 function MarkdownEditor() {
   const [markdownText, setMarkdownText] = useState("");
+  const { fileName } = useFileNameStore();
   const { docxXmlData } = useDocxXmlStore();
 
   useEffect(() => {
@@ -16,10 +18,24 @@ function MarkdownEditor() {
     setMarkdownText(event.target.value);
   };
 
+  const downloadMarkdownFile = () => {
+    const originName = fileName.substring(0, fileName.indexOf(".docx"));
+    const element = document.createElement("a");
+    const file = new Blob([markdownText], { type: "text/plain" });
+    element.href = URL.createObjectURL(file);
+    element.download = `${originName}.md`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
   return (
     <>
       <div className="flex">
         <h2>Markdown Editor</h2>
+        <button onClick={downloadMarkdownFile} className="border">
+          다운로드
+        </button>
         <textarea
           value={markdownText}
           onChange={handleChange}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import JSZip from "jszip";
 import { useNavigate } from "react-router-dom";
 
+import useFileNameStore from "../../store/useFileName";
 import useDocxXmlStore from "../../store/useDocxXml";
 import docxImage from "../../assets/docx.png";
 import markdownImage from "../../assets/markdown.png";
@@ -11,6 +12,7 @@ function DocxUploader() {
   const [labelText, setLabelText] = useState("Choose Word file");
   const [fileInfo, setFileInfo] = useState({ name: "", icon: "", file: null });
   const { setDocxXmlData } = useDocxXmlStore();
+  const { setFileName } = useFileNameStore();
   const navigate = useNavigate();
 
   const handleFileChange = (event) => {
@@ -49,6 +51,7 @@ function DocxUploader() {
 
   const handleConvert = async () => {
     if (fileInfo.file) {
+      setFileName(fileInfo.name);
       try {
         const zip = await JSZip.loadAsync(fileInfo.file);
         const xmlData = await zip.file("word/document.xml").async("string");
