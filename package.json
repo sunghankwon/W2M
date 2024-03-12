@@ -12,6 +12,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@tailwindcss/typography": "^0.5.10",
     "dotenv": "^16.4.5",
     "jszip": "^3.10.1",
     "marked": "^12.0.1",

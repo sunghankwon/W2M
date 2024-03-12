@@ -1,3 +1,21 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+
+.markdown-preview h1 {
+  font-size: 2em; /* 예시 크기, 필요에 따라 조정 */
+  margin-top: 0.67em;
+  margin-bottom: 0.67em;
+}
+
+.markdown-preview h2 {
+  font-size: 1.5em;
+  margin-top: 0.83em;
+  margin-bottom: 0.83em;
+}
+
+.markdown-preview h3 {
+  font-size: 1.17em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
