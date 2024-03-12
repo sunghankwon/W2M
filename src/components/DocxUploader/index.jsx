@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import useFileNameStore from "../../store/useFileName";
 import useDocxXmlStore from "../../store/useDocxXml";
+import printTextNodes from "../../utils/printTextNodes";
 import docxImage from "../../assets/docx.png";
 import markdownImage from "../../assets/markdown.png";
 import fileSearchIcon from "../../assets/file.png";
@@ -33,7 +34,10 @@ function DocxUploader() {
     }
   };
 
-  const clearSelection = () => {
+  const clearSelection = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+
     setFileInfo({ name: "", icon: "", file: null });
     setLabelText("Choose Word file");
     document.getElementById("fileInput").value = "";
@@ -56,6 +60,7 @@ function DocxUploader() {
         const zip = await JSZip.loadAsync(fileInfo.file);
         const xmlData = await zip.file("word/document.xml").async("string");
         setDocxXmlData(xmlData);
+        localStorage.setItem("docxXmlData", xmlData);
         navigate("/convert-markdown");
       } catch (error) {
         console.error("Error extracting XML from DOCX:", error);
@@ -94,8 +99,8 @@ function DocxUploader() {
                 />
                 <span className="mt-2">{fileInfo.name}</span>
                 <div
-                  className="absolute top-0 right-0 cursor-pointer text-xl text-red-500 transform translate-y-1/2 translate-x-1/2"
-                  onClick={clearSelection}
+                  className="absolute top-0 right-0 mt-2 mr-2 cursor-pointer text-xl text-red-500"
+                  onClick={(event) => clearSelection(event)}
                 >
                   &times;
                 </div>
