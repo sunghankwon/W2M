@@ -12,7 +12,7 @@ import fileSearchIcon from "../../assets/file.png";
 function DocxUploader() {
   const [labelText, setLabelText] = useState("Choose Word file");
   const [fileInfo, setFileInfo] = useState({ name: "", icon: "", file: null });
-  const { setDocxXmlData } = useDocxXmlStore();
+  const { setDocxXmlData, setRelationshipsData } = useDocxXmlStore();
   const { setFileName } = useFileNameStore();
   const navigate = useNavigate();
 
@@ -59,7 +59,12 @@ function DocxUploader() {
       try {
         const zip = await JSZip.loadAsync(fileInfo.file);
         const xmlData = await zip.file("word/document.xml").async("string");
+        const relsData = await zip
+          .file("word/_rels/document.xml.rels")
+          .async("string")
+          .catch(() => "");
         setDocxXmlData(xmlData);
+        setRelationshipsData(relsData);
         localStorage.setItem("docxXmlData", xmlData);
         navigate("/convert-markdown");
       } catch (error) {

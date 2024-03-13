@@ -1,17 +1,19 @@
 const printTextNodes = (
   node,
+  relationshipsData,
   markdown = "",
   depth = 0,
   headingLevel = "",
   markdownSyntax = "",
 ) => {
+  const relationshipsMap = parseRelationshipsData(relationshipsData);
+
   if (node.nodeType === 3 && node.textContent.trim()) {
     const reverseSyntax = markdownSyntax
       .split("")
       .reverse()
       .join("")
       .replace(">u<", "</u>");
-
     markdown += `${headingLevel}${markdownSyntax}${node.textContent.trim()}${reverseSyntax}\n`;
   } else if (node.nodeType === 1) {
     let newHeadingLevel = headingLevel;
@@ -38,6 +40,7 @@ const printTextNodes = (
             break;
         }
       }
+
       const boldStyles = node.getElementsByTagName("w:b");
 
       for (let bold of boldStyles) {
@@ -78,9 +81,30 @@ const printTextNodes = (
       }
     }
 
+    if (node.nodeName === "w:hyperlink") {
+      const linkId = node.getAttribute("r:id");
+      const targetUrl = relationshipsMap[linkId];
+      if (targetUrl) {
+        let linkMarkdown = "";
+        Array.from(node.childNodes).forEach((child) => {
+          linkMarkdown = printTextNodes(
+            child,
+            relationshipsData,
+            linkMarkdown,
+            depth + 1,
+            "",
+            "",
+          );
+        });
+        markdown += `[${linkMarkdown.trim()}](${targetUrl})`;
+        return markdown;
+      }
+    }
+
     Array.from(node.childNodes).forEach((child) => {
       markdown = printTextNodes(
         child,
+        relationshipsData,
         markdown,
         depth + 1,
         newHeadingLevel,
@@ -91,5 +115,23 @@ const printTextNodes = (
 
   return markdown;
 };
+
+function parseRelationshipsData(relationshipsDataXml) {
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(
+    relationshipsDataXml,
+    "application/xml",
+  );
+  const relationships = xmlDoc.getElementsByTagName("Relationship");
+  const relationshipMap = {};
+
+  for (let relationship of relationships) {
+    const id = relationship.getAttribute("Id");
+    const target = relationship.getAttribute("Target");
+    relationshipMap[id] = target;
+  }
+
+  return relationshipMap;
+}
 
 export default printTextNodes;
