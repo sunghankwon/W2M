@@ -11,15 +11,13 @@ function printTextNodes(
 ) {
   const relationshipsMap = parseRelationshipsData(relationshipsData);
   const numberingMap = parseNumberingData(numberingData);
+  let newHeadingLevel = headingLevel;
+  let newMarkdownSyntax = markdownSyntax;
 
   if (node.nodeType === 3 && node.textContent.trim()) {
     const content = `${headingLevel}${markdownSyntax}${node.textContent.trim()}${markdownSyntax.split("").reverse().join("").replace(">u<", "</u>")}`;
-    markdown += isListItem ? content : `${content}\n`;
+    markdown += isListItem || depth === 0 ? `${content}` : `${content} `;
   } else if (node.nodeType === 1) {
-    let newHeadingLevel = headingLevel;
-    let newMarkdownSyntax = markdownSyntax;
-    let listItemDetected = false;
-
     if (node.nodeName === "w:p") {
       if (!markdown.endsWith("\n\n")) {
         markdown += "\n";
@@ -74,31 +72,17 @@ function printTextNodes(
           isListItem = true;
         }
       }
-
-      function applyMarkdownSyntax(
-        node,
-        tagName,
-        attributeValue,
-        markdownSyntax,
-      ) {
-        const styles = node.getElementsByTagName(tagName);
-        for (let style of styles) {
-          const styleId = style.getAttribute("w:val");
-          if (
-            styleId === attributeValue &&
-            !newMarkdownSyntax.includes(markdownSyntax)
-          ) {
-            newMarkdownSyntax += markdownSyntax;
-          }
-        }
+    } else if (node.nodeName === "w:r") {
+      const childStyles = node.getElementsByTagName("w:rPr")[0];
+      if (childStyles) {
+        if (childStyles.getElementsByTagName("w:b").length > 0)
+          newMarkdownSyntax += "**";
+        if (childStyles.getElementsByTagName("w:i").length > 0)
+          newMarkdownSyntax += "_";
+        if (childStyles.getElementsByTagName("w:u").length > 0)
+          newMarkdownSyntax += "<u>";
       }
-
-      applyMarkdownSyntax(node, "w:b", "1", "**");
-      applyMarkdownSyntax(node, "w:i", "1", "_");
-      applyMarkdownSyntax(node, "w:u", "single", "<u>");
-    }
-
-    if (node.nodeName === "w:hyperlink") {
+    } else if (node.nodeName === "w:hyperlink") {
       const linkId = node.getAttribute("r:id");
       const targetUrl = relationshipsMap[linkId];
       if (targetUrl) {
@@ -127,9 +111,9 @@ function printTextNodes(
         markdown,
         depth + 1,
         newHeadingLevel,
-        newMarkdownSyntax,
+        child.nodeName === "w:rPr" ? "" : newMarkdownSyntax,
         listItemCounters,
-        listItemDetected,
+        isListItem,
       );
     });
   }
