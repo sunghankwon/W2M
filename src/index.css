@@ -3,7 +3,7 @@
 @import "tailwindcss/utilities";
 
 .markdown-preview h1 {
-  font-size: 2em; /* 예시 크기, 필요에 따라 조정 */
+  font-size: 2em;
   margin-top: 0.67em;
   margin-bottom: 0.67em;
 }
@@ -18,4 +18,8 @@
   font-size: 1.17em;
   margin-top: 1em;
   margin-bottom: 1em;
+}
+
+.markdown-preview a {
+  color: rgb(27, 27, 247);
 }

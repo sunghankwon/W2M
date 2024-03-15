@@ -1,31 +1,33 @@
-const printTextNodes = (
+function printTextNodes(
   node,
   relationshipsData,
+  numberingData,
   markdown = "",
   depth = 0,
   headingLevel = "",
   markdownSyntax = "",
-) => {
+  listItemCounters = {},
+  isListItem = false,
+) {
   const relationshipsMap = parseRelationshipsData(relationshipsData);
+  const numberingMap = parseNumberingData(numberingData);
 
   if (node.nodeType === 3 && node.textContent.trim()) {
-    const reverseSyntax = markdownSyntax
-      .split("")
-      .reverse()
-      .join("")
-      .replace(">u<", "</u>");
-    markdown += `${headingLevel}${markdownSyntax}${node.textContent.trim()}${reverseSyntax}\n`;
+    const content = `${headingLevel}${markdownSyntax}${node.textContent.trim()}${markdownSyntax.split("").reverse().join("").replace(">u<", "</u>")}`;
+    markdown += isListItem ? content : `${content}\n`;
   } else if (node.nodeType === 1) {
     let newHeadingLevel = headingLevel;
     let newMarkdownSyntax = markdownSyntax;
+    let listItemDetected = false;
 
     if (node.nodeName === "w:p") {
-      markdown += "\n";
-      const styles = node.getElementsByTagName("w:pStyle");
+      if (!markdown.endsWith("\n\n")) {
+        markdown += "\n";
+      }
 
+      const styles = node.getElementsByTagName("w:pStyle");
       for (let style of styles) {
         const styleId = style.getAttribute("w:val");
-
         switch (styleId) {
           case "Title":
           case "Heading1":
@@ -41,44 +43,59 @@ const printTextNodes = (
         }
       }
 
-      const boldStyles = node.getElementsByTagName("w:b");
+      const numPr = node.getElementsByTagName("w:numPr")[0];
+      if (numPr) {
+        const numId = numPr
+          .getElementsByTagName("w:numId")[0]
+          .getAttribute("w:val");
+        const ilvlElement = numPr.getElementsByTagName("w:ilvl")[0];
+        const ilvl = ilvlElement ? ilvlElement.getAttribute("w:val") : "0";
+        const numberingDefinition =
+          numberingMap[numId] && numberingMap[numId][ilvl];
 
-      for (let bold of boldStyles) {
-        const styleId = bold.getAttribute("w:val");
-        if (!newMarkdownSyntax.includes("**")) {
-          switch (styleId) {
-            case "1":
-              newMarkdownSyntax += "**";
-              break;
+        if (numberingDefinition) {
+          listItemCounters[numId] = listItemCounters[numId] || {};
+          listItemCounters[numId][ilvl] =
+            (listItemCounters[numId][ilvl] || 0) + 1;
+
+          let prefix = "";
+          if (numberingDefinition.numFmt === "bullet") {
+            prefix = "   ".repeat(parseInt(ilvl)) + "- ";
+          } else {
+            const counter = listItemCounters[numId][ilvl];
+            prefix =
+              "   ".repeat(parseInt(ilvl)) +
+              (ilvl === "0"
+                ? counter + "."
+                : String.fromCharCode(96 + counter) + ".");
+          }
+
+          markdown += prefix + " ";
+          isListItem = true;
+        }
+      }
+
+      function applyMarkdownSyntax(
+        node,
+        tagName,
+        attributeValue,
+        markdownSyntax,
+      ) {
+        const styles = node.getElementsByTagName(tagName);
+        for (let style of styles) {
+          const styleId = style.getAttribute("w:val");
+          if (
+            styleId === attributeValue &&
+            !newMarkdownSyntax.includes(markdownSyntax)
+          ) {
+            newMarkdownSyntax += markdownSyntax;
           }
         }
       }
 
-      const italicStyles = node.getElementsByTagName("w:i");
-
-      for (let italic of italicStyles) {
-        const styleId = italic.getAttribute("w:val");
-        if (!newMarkdownSyntax.includes("_")) {
-          switch (styleId) {
-            case "1":
-              newMarkdownSyntax += "_";
-              break;
-          }
-        }
-      }
-
-      const underLineStyles = node.getElementsByTagName("w:u");
-
-      for (let underLine of underLineStyles) {
-        const styleId = underLine.getAttribute("w:val");
-        if (!newMarkdownSyntax.includes("<u>")) {
-          switch (styleId) {
-            case "single":
-              newMarkdownSyntax += "<u>";
-              break;
-          }
-        }
-      }
+      applyMarkdownSyntax(node, "w:b", "1", "**");
+      applyMarkdownSyntax(node, "w:i", "1", "_");
+      applyMarkdownSyntax(node, "w:u", "single", "<u>");
     }
 
     if (node.nodeName === "w:hyperlink") {
@@ -90,6 +107,7 @@ const printTextNodes = (
           linkMarkdown = printTextNodes(
             child,
             relationshipsData,
+            numberingData,
             linkMarkdown,
             depth + 1,
             "",
@@ -105,16 +123,19 @@ const printTextNodes = (
       markdown = printTextNodes(
         child,
         relationshipsData,
+        numberingData,
         markdown,
         depth + 1,
         newHeadingLevel,
         newMarkdownSyntax,
+        listItemCounters,
+        listItemDetected,
       );
     });
   }
 
   return markdown;
-};
+}
 
 function parseRelationshipsData(relationshipsDataXml) {
   const parser = new DOMParser();
@@ -132,6 +153,44 @@ function parseRelationshipsData(relationshipsDataXml) {
   }
 
   return relationshipMap;
+}
+
+function parseNumberingData(numberingDataXml) {
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(numberingDataXml, "application/xml");
+  const nums = xmlDoc.getElementsByTagName("w:num");
+  const abstractNums = xmlDoc.getElementsByTagName("w:abstractNum");
+  const abstractNumIdToDefinition = {};
+
+  for (let abstractNum of abstractNums) {
+    const abstractNumId = abstractNum.getAttribute("w:abstractNumId");
+    const lvls = abstractNum.getElementsByTagName("w:lvl");
+    const levelsDefinition = {};
+
+    for (let lvl of lvls) {
+      const ilvl = lvl.getAttribute("w:ilvl");
+      const numFmt = lvl
+        .getElementsByTagName("w:numFmt")[0]
+        .getAttribute("w:val");
+      const lvlText = lvl
+        .getElementsByTagName("w:lvlText")[0]
+        .getAttribute("w:val");
+      levelsDefinition[ilvl] = { numFmt, lvlText };
+    }
+
+    abstractNumIdToDefinition[abstractNumId] = levelsDefinition;
+  }
+
+  const numIdToDefinition = {};
+  for (let num of nums) {
+    const numId = num.getAttribute("w:numId");
+    const abstractNumIdRef = num
+      .getElementsByTagName("w:abstractNumId")[0]
+      .getAttribute("w:val");
+    numIdToDefinition[numId] = abstractNumIdToDefinition[abstractNumIdRef];
+  }
+
+  return numIdToDefinition;
 }
 
 export default printTextNodes;

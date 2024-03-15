@@ -1,10 +1,9 @@
 import { useState } from "react";
-import JSZip from "jszip";
 import { useNavigate } from "react-router-dom";
+import JSZip from "jszip";
 
 import useFileNameStore from "../../store/useFileName";
 import useDocxXmlStore from "../../store/useDocxXml";
-import printTextNodes from "../../utils/printTextNodes";
 import docxImage from "../../assets/docx.png";
 import markdownImage from "../../assets/markdown.png";
 import fileSearchIcon from "../../assets/file.png";
@@ -12,7 +11,8 @@ import fileSearchIcon from "../../assets/file.png";
 function DocxUploader() {
   const [labelText, setLabelText] = useState("Choose Word file");
   const [fileInfo, setFileInfo] = useState({ name: "", icon: "", file: null });
-  const { setDocxXmlData, setRelationshipsData } = useDocxXmlStore();
+  const { setDocxXmlData, setRelationshipsData, setNumberingData } =
+    useDocxXmlStore();
   const { setFileName } = useFileNameStore();
   const navigate = useNavigate();
 
@@ -58,13 +58,21 @@ function DocxUploader() {
       setFileName(fileInfo.name);
       try {
         const zip = await JSZip.loadAsync(fileInfo.file);
+        console.log(zip);
         const xmlData = await zip.file("word/document.xml").async("string");
+
         const relsData = await zip
           .file("word/_rels/document.xml.rels")
-          .async("string")
-          .catch(() => "");
+          .async("string");
+
+        const numberingData = await zip
+          .file("word/numbering.xml")
+          .async("string");
+
         setDocxXmlData(xmlData);
         setRelationshipsData(relsData);
+        setNumberingData(numberingData);
+
         localStorage.setItem("docxXmlData", xmlData);
         navigate("/convert-markdown");
       } catch (error) {

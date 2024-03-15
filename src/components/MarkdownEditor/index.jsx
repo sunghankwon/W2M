@@ -9,7 +9,7 @@ function MarkdownEditor() {
   const [markdownText, setMarkdownText] = useState("");
   const [originName, setOriginName] = useState("");
   const { fileName } = useFileNameStore();
-  const { docxXmlData, relationshipsData } = useDocxXmlStore();
+  const { docxXmlData, relationshipsData, numberingData } = useDocxXmlStore();
 
   useEffect(() => {
     setOriginName(fileName.substring(0, fileName.indexOf(".docx")));
@@ -27,6 +27,7 @@ function MarkdownEditor() {
     const convertedMarkdown = printTextNodes(
       xmlDoc.documentElement,
       relationshipsData,
+      numberingData,
     );
 
     setMarkdownText(convertedMarkdown);
@@ -40,10 +41,10 @@ function MarkdownEditor() {
     navigator.clipboard
       .writeText(markdownText)
       .then(() => {
-        alert("텍스트가 클립보드에 복사되었습니다.");
+        alert("The text has been copied to the clipboard.");
       })
-      .catch((err) => {
-        console.error("복사에 실패했습니다: ", err);
+      .catch((error) => {
+        console.error("The copy failed: ", error);
       });
   };
 
