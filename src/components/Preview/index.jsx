@@ -1,6 +1,7 @@
+import { forwardRef } from "react";
 import { marked } from "marked";
 
-const Preview = ({ markdownText }) => {
+const Preview = forwardRef(({ markdownText, handlePreviewScroll }, ref) => {
   const getMarkdownText = () => {
     marked.setOptions({
       breaks: true,
@@ -11,10 +12,12 @@ const Preview = ({ markdownText }) => {
 
   return (
     <div
-      className="w-[706px] h-[617px] border rounded-md overflow-y-auto pl-2 markdown-preview prose lg:prose-xs"
+      ref={ref}
+      onScroll={handlePreviewScroll}
+      className="w-[706px] h-[617px] border rounded-md overflow-y-auto scrollbar-hide pl-2 markdown-preview prose lg:prose-xs"
       dangerouslySetInnerHTML={getMarkdownText()}
     />
   );
-};
+});
 
 export default Preview;

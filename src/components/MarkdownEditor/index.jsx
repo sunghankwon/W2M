@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import Preview from "../Preview";
 import useDocxXmlStore from "../../store/useDocxXml";
@@ -10,6 +10,9 @@ function MarkdownEditor() {
   const [originName, setOriginName] = useState("");
   const { fileName } = useFileNameStore();
   const { docxXmlData, relationshipsData, numberingData } = useDocxXmlStore();
+  const previewRef = useRef(null);
+  const editorRef = useRef(null);
+  const isProgrammaticScroll = useRef(false);
 
   useEffect(() => {
     setOriginName(fileName.substring(0, fileName.indexOf(".docx")));
@@ -37,6 +40,40 @@ function MarkdownEditor() {
     setMarkdownText(event.target.value);
   };
 
+  const handleEditorScroll = (event) => {
+    if (isProgrammaticScroll.current) {
+      return;
+    }
+    isProgrammaticScroll.current = true;
+
+    const { scrollTop, scrollHeight, clientHeight } = event.target;
+    const previewScrollHeight =
+      previewRef.current.scrollHeight - previewRef.current.clientHeight;
+    const scrollRatio = scrollTop / (scrollHeight - clientHeight);
+    previewRef.current.scrollTop = previewScrollHeight * scrollRatio;
+
+    setTimeout(() => {
+      isProgrammaticScroll.current = false;
+    }, 10);
+  };
+
+  const handlePreviewScroll = (event) => {
+    if (isProgrammaticScroll.current) {
+      return;
+    }
+    isProgrammaticScroll.current = true;
+
+    const { scrollTop, scrollHeight, clientHeight } = event.target;
+    const editorScrollHeight =
+      editorRef.current.scrollHeight - editorRef.current.clientHeight;
+    const scrollRatio = scrollTop / (scrollHeight - clientHeight);
+    editorRef.current.scrollTop = editorScrollHeight * scrollRatio;
+
+    setTimeout(() => {
+      isProgrammaticScroll.current = false;
+    }, 10);
+  };
+
   const copyToClipboard = () => {
     navigator.clipboard
       .writeText(markdownText)
@@ -62,13 +99,15 @@ function MarkdownEditor() {
     <>
       <div className="flex justify-center items-start">
         <div className="flex flex-col mr-8">
-          <h2>{originName}.md</h2>
+          <h2 className="text-xl">{originName}.md</h2>
           <textarea
             value={markdownText}
             onChange={handleChange}
+            onScroll={handleEditorScroll}
+            ref={editorRef}
             rows="25"
             cols="80"
-            className="p-2 border border-gray-300 rounded-lg"
+            className="p-2 mr-10 border border-gray-300 rounded-lg scrollbar-hide"
           />
           <div className="mt-4">
             <button
@@ -83,8 +122,12 @@ function MarkdownEditor() {
           </div>
         </div>
         <div className="flex flex-col">
-          <h2>Preview</h2>
-          <Preview markdownText={markdownText} />
+          <h2 className="text-xl">Preview</h2>
+          <Preview
+            markdownText={markdownText}
+            ref={previewRef}
+            handlePreviewScroll={handlePreviewScroll}
+          />
         </div>
       </div>
     </>
