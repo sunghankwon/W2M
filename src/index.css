@@ -23,3 +23,27 @@
 .markdown-preview a {
   color: rgb(27, 27, 247);
 }
+
+.markdown-preview table {
+  width: auto;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: auto;
+  border-collapse: collapse;
+}
+
+.markdown-preview th,
+.markdown-preview td {
+  border: 1px solid black;
+  padding: 8px;
+}
+
+.markdown-preview th {
+  background-color: #f2f2f2;
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    @apply hidden;
+  }
+}

@@ -19,7 +19,7 @@ function printTextNodes(
     markdown += isListItem || depth === 0 ? `${content}` : `${content} `;
   } else if (node.nodeType === 1) {
     if (node.nodeName === "w:p") {
-      if (!markdown.endsWith("\n\n")) {
+      if (!markdown.endsWith("\n\n") && markdown !== "") {
         markdown += "\n";
       }
 
@@ -101,6 +101,37 @@ function printTextNodes(
         markdown += `[${linkMarkdown.trim()}](${targetUrl})`;
         return markdown;
       }
+    } else if (node.nodeName === "w:tbl") {
+      let rowsMarkdown = [];
+      let headerSeparator = "|";
+      let isHeader = true;
+
+      Array.from(node.getElementsByTagName("w:tr")).forEach((tr, rowIndex) => {
+        let rowMarkdown = "|";
+        Array.from(tr.getElementsByTagName("w:tc")).forEach((tc, cellIndex) => {
+          let cellText = "";
+          Array.from(tc.getElementsByTagName("w:t")).forEach((t) => {
+            cellText += t.textContent;
+          });
+
+          rowMarkdown += ` ${cellText} |`;
+
+          if (isHeader) {
+            headerSeparator += " ------ |";
+          }
+        });
+
+        rowsMarkdown.push(rowMarkdown);
+
+        if (isHeader) {
+          rowsMarkdown.push(headerSeparator);
+          isHeader = false;
+        }
+      });
+
+      markdown += rowsMarkdown.join("\n") + "\n";
+
+      return markdown;
     }
 
     Array.from(node.childNodes).forEach((child) => {
