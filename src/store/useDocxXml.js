@@ -2,11 +2,9 @@ import { create } from "zustand";
 
 const useDocxXmlStore = create((set) => ({
   docxXmlData: "",
-  relationshipsData: "",
-  numberingData: "",
+  docxFilesData: "",
   setDocxXmlData: (docxXmlData) => set({ docxXmlData }),
-  setRelationshipsData: (relationshipsData) => set({ relationshipsData }),
-  setNumberingData: (numberingData) => set({ numberingData }),
+  setDocxFilesData: (docxFilesData) => set({ docxFilesData }),
 }));
 
 export default useDocxXmlStore;

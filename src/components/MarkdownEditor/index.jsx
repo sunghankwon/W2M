@@ -9,7 +9,7 @@ function MarkdownEditor() {
   const [markdownText, setMarkdownText] = useState("");
   const [originName, setOriginName] = useState("");
   const { fileName } = useFileNameStore();
-  const { docxXmlData, relationshipsData, numberingData } = useDocxXmlStore();
+  const { docxXmlData, docxFilesData } = useDocxXmlStore();
   const previewRef = useRef(null);
   const editorRef = useRef(null);
   const isProgrammaticScroll = useRef(false);
@@ -17,6 +17,7 @@ function MarkdownEditor() {
   useEffect(() => {
     setOriginName(fileName.substring(0, fileName.indexOf(".docx")));
     let xmlDoc;
+    console.log(docxFilesData);
 
     if (docxXmlData !== "") {
       xmlDoc = new DOMParser().parseFromString(docxXmlData, "text/xml");
@@ -29,8 +30,7 @@ function MarkdownEditor() {
     }
     const convertedMarkdown = printTextNodes(
       xmlDoc.documentElement,
-      relationshipsData,
-      numberingData,
+      docxFilesData,
     );
 
     setMarkdownText(convertedMarkdown);

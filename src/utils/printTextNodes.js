@@ -1,7 +1,6 @@
 function printTextNodes(
   node,
-  relationshipsData,
-  numberingData,
+  docxFilesData,
   markdown = "",
   depth = 0,
   headingLevel = "",
@@ -9,8 +8,12 @@ function printTextNodes(
   listItemCounters = {},
   isListItem = false,
 ) {
-  const relationshipsMap = parseRelationshipsData(relationshipsData);
-  const numberingMap = parseNumberingData(numberingData);
+  const relationshipsDataXml = docxFilesData["word/_rels/document.xml.rels"];
+  const numberingDataXml = docxFilesData["word/numbering.xml"];
+
+  const relationshipsMap = parseRelationshipsData(relationshipsDataXml);
+  const numberingMap = parseNumberingData(numberingDataXml);
+
   let newHeadingLevel = headingLevel;
   let newMarkdownSyntax = markdownSyntax;
 
@@ -35,8 +38,11 @@ function printTextNodes(
           case "Heading2":
             newHeadingLevel = "## ";
             break;
-          default:
+          case "Heading3":
             newHeadingLevel = "### ";
+            break;
+          default:
+            newHeadingLevel = "#### ";
             break;
         }
       }
@@ -90,8 +96,7 @@ function printTextNodes(
         Array.from(node.childNodes).forEach((child) => {
           linkMarkdown = printTextNodes(
             child,
-            relationshipsData,
-            numberingData,
+            docxFilesData,
             linkMarkdown,
             depth + 1,
             "",
@@ -137,8 +142,7 @@ function printTextNodes(
     Array.from(node.childNodes).forEach((child) => {
       markdown = printTextNodes(
         child,
-        relationshipsData,
-        numberingData,
+        docxFilesData,
         markdown,
         depth + 1,
         newHeadingLevel,

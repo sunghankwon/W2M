@@ -11,8 +11,7 @@ import fileSearchIcon from "../../assets/file.png";
 function DocxUploader() {
   const [labelText, setLabelText] = useState("Choose Word file");
   const [fileInfo, setFileInfo] = useState({ name: "", icon: "", file: null });
-  const { setDocxXmlData, setRelationshipsData, setNumberingData } =
-    useDocxXmlStore();
+  const { setDocxXmlData, setDocxFilesData } = useDocxXmlStore();
   const { setFileName } = useFileNameStore();
   const navigate = useNavigate();
 
@@ -60,20 +59,29 @@ function DocxUploader() {
         const zip = await JSZip.loadAsync(fileInfo.file);
         console.log(zip);
         const xmlData = await zip.file("word/document.xml").async("string");
-
-        const relsData = await zip
-          .file("word/_rels/document.xml.rels")
-          .async("string");
-
-        const numberingData = await zip
-          .file("word/numbering.xml")
-          .async("string");
-
         setDocxXmlData(xmlData);
-        setRelationshipsData(relsData);
-        setNumberingData(numberingData);
-
         localStorage.setItem("docxXmlData", xmlData);
+
+        let docxFilesDataPromises = [];
+
+        zip.forEach((relativePath, file) => {
+          if (!file.dir) {
+            docxFilesDataPromises.push(
+              file.async("string").then((content) => {
+                return { key: relativePath, value: content };
+              }),
+            );
+          }
+        });
+
+        let results = await Promise.all(docxFilesDataPromises);
+        let docxFilesData = {};
+        results.forEach(({ key, value }) => {
+          docxFilesData[key] = value;
+        });
+
+        setDocxFilesData(docxFilesData);
+
         navigate("/convert-markdown");
       } catch (error) {
         console.error("Error extracting XML from DOCX:", error);
