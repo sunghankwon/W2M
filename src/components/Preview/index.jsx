@@ -14,7 +14,7 @@ const Preview = forwardRef(({ markdownText, handlePreviewScroll }, ref) => {
     <div
       ref={ref}
       onScroll={handlePreviewScroll}
-      className="w-[706px] h-[617px] border rounded-md overflow-y-auto scrollbar-hide pl-2 markdown-preview prose lg:prose-xs"
+      className="w-[706px] h-[650px] border rounded-md overflow-y-auto scrollbar-hide pl-2 markdown-preview prose lg:prose-xs"
       dangerouslySetInnerHTML={getMarkdownText()}
     />
   );
