@@ -2,13 +2,13 @@ import w2mLogo from "../../assets/w2mLogo.png";
 
 function Header() {
   return (
-    <div className="flex items-center justify-center mt-8 mb-10">
+    <div className="flex items-center justify-center mt-8 mb-8">
       <img
         src={w2mLogo}
         alt="W2M Logo"
-        className="w-24 h-24 sm:w-28 sm:h-28 mr-6"
+        className="w-20 h-20 mr-6 sm:w-20 sm:h-20"
       />
-      <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold">
+      <h1 className="text-4xl font-bold sm:text-4xl md:text-4xl lg:text-6xl">
         W2M
       </h1>
     </div>

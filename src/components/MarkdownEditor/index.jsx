@@ -1,135 +1,85 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 
-import Preview from "../Preview";
-import useDocxXmlStore from "../../store/useDocxXml";
-import useFileNameStore from "../../store/useFileName";
-import printTextNodes from "../../utils/printTextNodes";
+import { Toolbar } from "../CustomTools/Toolbar";
 
-function MarkdownEditor() {
-  const [markdownText, setMarkdownText] = useState("");
-  const [originName, setOriginName] = useState("");
-  const { fileName } = useFileNameStore();
-  const { docxXmlData, docxFilesData } = useDocxXmlStore();
-  const previewRef = useRef(null);
-  const editorRef = useRef(null);
-  const isProgrammaticScroll = useRef(false);
+function MarkdownEditor({
+  markdownText,
+  setMarkdownText,
+  handleEditorScroll,
+  editorRef,
+}) {
+  const historyRef = useRef([markdownText]);
+  const historyIndexRef = useRef(0);
 
   useEffect(() => {
-    setOriginName(fileName.substring(0, fileName.indexOf(".docx")));
-    let xmlDoc;
-    console.log(docxFilesData);
-
-    if (docxXmlData !== "") {
-      xmlDoc = new DOMParser().parseFromString(docxXmlData, "text/xml");
-    } else {
-      const localDocxXmlData = localStorage.getItem("docxXmlData");
-
-      if (localDocxXmlData) {
-        xmlDoc = new DOMParser().parseFromString(localDocxXmlData, "text/xml");
+    const handleKeyDown = (event) => {
+      if (event.metaKey || event.ctrlKey) {
+        if (event.key === "z" && !event.shiftKey) {
+          event.preventDefault();
+          undo();
+        } else if (
+          (event.key === "Z" && event.shiftKey) ||
+          (event.key === "z" && event.shiftKey)
+        ) {
+          event.preventDefault();
+          redo();
+        }
       }
-    }
-    const convertedMarkdown = printTextNodes(
-      xmlDoc.documentElement,
-      docxFilesData,
-    );
+    };
 
-    setMarkdownText(convertedMarkdown);
+    const textarea = editorRef.current;
+    textarea.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      textarea.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
+  const undo = () => {
+    const newHistoryIndex = historyIndexRef.current - 1;
+    if (newHistoryIndex < 0) return;
+    historyIndexRef.current = newHistoryIndex;
+    const previousValue = historyRef.current[newHistoryIndex];
+    setMarkdownText(previousValue);
+  };
+
+  const redo = () => {
+    const maxIndex = historyRef.current.length - 1;
+    const newHistoryIndex = historyIndexRef.current + 1;
+    if (newHistoryIndex > maxIndex) return;
+    historyIndexRef.current = newHistoryIndex;
+    const nextValue = historyRef.current[newHistoryIndex];
+    setMarkdownText(nextValue);
+  };
+
   const handleChange = (event) => {
-    setMarkdownText(event.target.value);
-  };
+    const newValue = event.target.value;
+    setMarkdownText(newValue);
 
-  const handleEditorScroll = (event) => {
-    if (isProgrammaticScroll.current) {
-      return;
+    if (newValue.endsWith(" ") || newValue.endsWith("\n")) {
+      const newHistoryIndex = historyIndexRef.current + 1;
+      historyRef.current = historyRef.current.slice(0, newHistoryIndex);
+      historyRef.current.push(newValue);
+      historyIndexRef.current = newHistoryIndex;
     }
-    isProgrammaticScroll.current = true;
-
-    const { scrollTop, scrollHeight, clientHeight } = event.target;
-    const previewScrollHeight =
-      previewRef.current.scrollHeight - previewRef.current.clientHeight;
-    const scrollRatio = scrollTop / (scrollHeight - clientHeight);
-    previewRef.current.scrollTop = previewScrollHeight * scrollRatio;
-
-    setTimeout(() => {
-      isProgrammaticScroll.current = false;
-    }, 10);
-  };
-
-  const handlePreviewScroll = (event) => {
-    if (isProgrammaticScroll.current) {
-      return;
-    }
-    isProgrammaticScroll.current = true;
-
-    const { scrollTop, scrollHeight, clientHeight } = event.target;
-    const editorScrollHeight =
-      editorRef.current.scrollHeight - editorRef.current.clientHeight;
-    const scrollRatio = scrollTop / (scrollHeight - clientHeight);
-    editorRef.current.scrollTop = editorScrollHeight * scrollRatio;
-
-    setTimeout(() => {
-      isProgrammaticScroll.current = false;
-    }, 10);
-  };
-
-  const copyToClipboard = () => {
-    navigator.clipboard
-      .writeText(markdownText)
-      .then(() => {
-        alert("The text has been copied to the clipboard.");
-      })
-      .catch((error) => {
-        console.error("The copy failed: ", error);
-      });
-  };
-
-  const downloadMarkdownFile = () => {
-    const element = document.createElement("a");
-    const file = new Blob([markdownText], { type: "text/plain" });
-    element.href = URL.createObjectURL(file);
-    element.download = `${originName}.md`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
   };
 
   return (
     <>
-      <div className="flex justify-center items-start">
-        <div className="flex flex-col mr-8">
-          <h2 className="text-xl">{originName}.md</h2>
-          <textarea
-            value={markdownText}
-            onChange={handleChange}
-            onScroll={handleEditorScroll}
-            ref={editorRef}
-            rows="25"
-            cols="80"
-            className="p-2 mr-10 border border-gray-300 rounded-lg scrollbar-hide"
-          />
-          <div className="mt-4">
-            <button
-              onClick={downloadMarkdownFile}
-              className="border p-2 rounded-lg mr-2"
-            >
-              다운로드
-            </button>
-            <button onClick={copyToClipboard} className="border p-2 rounded-lg">
-              복사
-            </button>
-          </div>
-        </div>
-        <div className="flex flex-col">
-          <h2 className="text-xl">Preview</h2>
-          <Preview
-            markdownText={markdownText}
-            ref={previewRef}
-            handlePreviewScroll={handlePreviewScroll}
-          />
-        </div>
-      </div>
+      <Toolbar
+        editorRef={editorRef}
+        markdownText={markdownText}
+        setMarkdownText={setMarkdownText}
+      />
+      <textarea
+        value={markdownText}
+        onChange={handleChange}
+        onScroll={handleEditorScroll}
+        ref={editorRef}
+        rows="23"
+        cols="80"
+        className="p-2 mr-10 border border-gray-300 rounded-lg scrollbar-hide"
+      />
     </>
   );
 }
