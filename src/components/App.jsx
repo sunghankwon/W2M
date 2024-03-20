@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 
 import Header from "./Header";
 import DocxUploader from "./DocxUploader";
-import MarkdownEditor from "./MarkdownEditor";
+import MarkdownConvert from "./MarkdownConvert";
 
 function App() {
   return (
@@ -10,7 +10,7 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" exact element={<DocxUploader />} />
-        <Route path="/convert-markdown" exact element={<MarkdownEditor />} />
+        <Route path="/convert-markdown" exact element={<MarkdownConvert />} />
       </Routes>
     </div>
   );
