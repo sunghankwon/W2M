@@ -1,4 +1,6 @@
-function printTextNodes(
+import s3Uploader from "./s3Uploader";
+
+async function printTextNodes(
   node,
   docxFilesData,
   markdown = "",
@@ -7,6 +9,9 @@ function printTextNodes(
   markdownSyntax = "",
   listItemCounters = {},
   isListItem = false,
+  uploadedImagesMap = {},
+  processedImages = new Set(),
+  addedImages = new Set(),
 ) {
   const relationshipsDataXml = docxFilesData["word/_rels/document.xml.rels"];
   const numberingDataXml = docxFilesData["word/numbering.xml"];
@@ -22,7 +27,7 @@ function printTextNodes(
     markdown += isListItem || depth === 0 ? `${content}` : `${content} `;
   } else if (node.nodeType === 1) {
     if (node.nodeName === "w:p") {
-      if (!markdown.endsWith("\n\n") && markdown !== "") {
+      if (!markdown.endsWith("\n\n")) {
         markdown += "\n";
       }
 
@@ -93,17 +98,24 @@ function printTextNodes(
       const targetUrl = relationshipsMap[linkId];
       if (targetUrl) {
         let linkMarkdown = "";
-        Array.from(node.childNodes).forEach((child) => {
-          linkMarkdown = printTextNodes(
+        for (const child of Array.from(node.childNodes)) {
+          const childMarkdown = await printTextNodes(
             child,
             docxFilesData,
             linkMarkdown,
             depth + 1,
             "",
             "",
+            listItemCounters,
+            isListItem,
+            uploadedImagesMap,
+            processedImages,
+            addedImages,
           );
-        });
-        markdown += `[${linkMarkdown.trim()}](${targetUrl})`;
+          linkMarkdown += childMarkdown;
+        }
+        markdown += `[${linkMarkdown.trim()}](${targetUrl})\n`;
+
         return markdown;
       }
     } else if (node.nodeName === "w:tbl") {
@@ -137,20 +149,65 @@ function printTextNodes(
       markdown += rowsMarkdown.join("\n") + "\n";
 
       return markdown;
+    } else if (node.nodeName === "wp:inline" || node.nodeName === "w:drawing") {
+      const blipElements = node.getElementsByTagName("a:blip");
+      for (let blip of blipElements) {
+        const rEmbed = blip.getAttribute("r:embed");
+        const imgFilePath = relationshipsMap[rEmbed];
+        const completeImgFilePath = `word/${imgFilePath}`;
+
+        if (
+          processedImages.has(rEmbed) ||
+          addedImages.has(completeImgFilePath)
+        ) {
+          continue;
+        }
+
+        let imageUrl;
+        if (!uploadedImagesMap.hasOwnProperty(completeImgFilePath)) {
+          const imageFile = docxFilesData[completeImgFilePath];
+          const fileExtension = imgFilePath.split(".").pop();
+          let mimeType = fileExtension === "png" ? "image/png" : "image/jpeg";
+
+          try {
+            imageUrl = await s3Uploader(
+              imageFile,
+              `${Date.now()}-${fileExtension}`,
+              mimeType,
+            );
+            uploadedImagesMap[completeImgFilePath] = imageUrl;
+          } catch (err) {
+            console.error("S3 Upload Error: ", err);
+          }
+        } else {
+          imageUrl = uploadedImagesMap[completeImgFilePath];
+        }
+
+        if (imageUrl) {
+          markdown += `![Image](${imageUrl})\n`;
+          addedImages.add(completeImgFilePath);
+        }
+
+        processedImages.add(rEmbed);
+      }
     }
 
-    Array.from(node.childNodes).forEach((child) => {
-      markdown = printTextNodes(
+    for (const child of Array.from(node.childNodes)) {
+      const childMarkdown = await printTextNodes(
         child,
         docxFilesData,
-        markdown,
+        "",
         depth + 1,
         newHeadingLevel,
-        child.nodeName === "w:rPr" ? "" : newMarkdownSyntax,
+        newMarkdownSyntax,
         listItemCounters,
         isListItem,
+        uploadedImagesMap,
+        processedImages,
+        addedImages,
       );
-    });
+      markdown += childMarkdown;
+    }
   }
 
   return markdown;
