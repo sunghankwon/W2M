@@ -16,6 +16,8 @@ export function UpperCaseButton({ editorRef, markdownText, setMarkdownText }) {
         markdownText.substring(0, startPos) +
         uppercaseText +
         markdownText.substring(endPos);
+    } else {
+      return;
     }
 
     setMarkdownText(newText);

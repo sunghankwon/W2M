@@ -21,6 +21,8 @@ export function CapitalizeButton({ editorRef, markdownText, setMarkdownText }) {
         markdownText.substring(0, startPos) +
         capitalizedText +
         markdownText.substring(endPos);
+    } else {
+      return;
     }
 
     setMarkdownText(newText);
