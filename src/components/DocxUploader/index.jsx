@@ -66,8 +66,12 @@ function DocxUploader() {
 
         zip.forEach((relativePath, file) => {
           if (!file.dir) {
+            let asyncType = "string";
+            if (relativePath.startsWith("word/media/")) {
+              asyncType = "blob";
+            }
             docxFilesDataPromises.push(
-              file.async("string").then((content) => {
+              file.async(asyncType).then((content) => {
                 return { key: relativePath, value: content };
               }),
             );
@@ -92,13 +96,13 @@ function DocxUploader() {
   return (
     <>
       <div
-        className="w-full max-w-none mt-10 mb-4 flex flex-col items-center justify-center"
+        className="flex flex-col items-center justify-center w-full mt-10 mb-4 max-w-none"
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
         <label
           htmlFor="fileInput"
-          className="w-11/12 flex justify-center items-center cursor-pointer"
+          className="flex items-center justify-center w-11/12 cursor-pointer"
         >
           <input
             type="file"
@@ -108,7 +112,7 @@ function DocxUploader() {
             accept=".docx"
           />
           <div
-            className="w-full bg-gray-500 text-white flex flex-col items-center justify-center font-bold py-3 px-4 rounded-lg text-lg sm:text-xl md:text-2xl space-y-2 relative"
+            className="relative flex flex-col items-center justify-center w-full px-4 py-3 space-y-2 text-lg font-bold text-white bg-gray-500 rounded-lg sm:text-xl md:text-2xl"
             style={{ minHeight: "200px" }}
           >
             {fileInfo.name ? (
@@ -120,7 +124,7 @@ function DocxUploader() {
                 />
                 <span className="mt-2">{fileInfo.name}</span>
                 <div
-                  className="absolute top-0 right-0 mt-2 mr-2 cursor-pointer text-xl text-red-500"
+                  className="absolute top-0 right-0 mt-2 mr-2 text-xl text-red-500 cursor-pointer"
                   onClick={(event) => clearSelection(event)}
                 >
                   &times;
@@ -131,7 +135,7 @@ function DocxUploader() {
                 <img
                   src={fileSearchIcon}
                   alt="File search icon"
-                  className="w-24 h-24 sm:w-28 sm:h-28 mb-2"
+                  className="w-24 h-24 mb-2 sm:w-28 sm:h-28"
                 />
                 <span>{labelText}</span>
               </div>
@@ -141,7 +145,7 @@ function DocxUploader() {
       </div>
 
       <div className="flex flex-col items-center justify-center mt-10 mb-4">
-        <div className="flex justify-center items-center space-x-4 mb-4">
+        <div className="flex items-center justify-center mb-4 space-x-4">
           <div className="flex flex-col items-center">
             <img
               src={docxImage}
