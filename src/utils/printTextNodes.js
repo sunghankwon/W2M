@@ -1,5 +1,3 @@
-import s3Uploader from "./s3Uploader";
-
 async function printTextNodes(
   node,
   docxFilesData,
@@ -9,7 +7,6 @@ async function printTextNodes(
   markdownSyntax = "",
   listItemCounters = {},
   isListItem = false,
-  uploadedImagesMap = {},
   processedImages = new Set(),
   addedImages = new Set(),
 ) {
@@ -108,7 +105,6 @@ async function printTextNodes(
             "",
             listItemCounters,
             isListItem,
-            uploadedImagesMap,
             processedImages,
             addedImages,
           );
@@ -156,39 +152,11 @@ async function printTextNodes(
         const imgFilePath = relationshipsMap[rEmbed];
         const completeImgFilePath = `word/${imgFilePath}`;
 
-        if (
-          processedImages.has(rEmbed) ||
-          addedImages.has(completeImgFilePath)
-        ) {
-          continue;
-        }
-
-        let imageUrl;
-        if (!uploadedImagesMap.hasOwnProperty(completeImgFilePath)) {
-          const imageFile = docxFilesData[completeImgFilePath];
-          const fileExtension = imgFilePath.split(".").pop();
-          let mimeType = fileExtension === "png" ? "image/png" : "image/jpeg";
-
-          try {
-            imageUrl = await s3Uploader(
-              imageFile,
-              `${Date.now()}-${fileExtension}`,
-              mimeType,
-            );
-            uploadedImagesMap[completeImgFilePath] = imageUrl;
-          } catch (err) {
-            console.error("S3 Upload Error: ", err);
-          }
-        } else {
-          imageUrl = uploadedImagesMap[completeImgFilePath];
-        }
-
-        if (imageUrl) {
-          markdown += `![Image](${imageUrl})\n`;
-          addedImages.add(completeImgFilePath);
-        }
-
+        markdown += `![Image](./${completeImgFilePath})\n`;
+        addedImages.add(completeImgFilePath);
         processedImages.add(rEmbed);
+
+        return markdown;
       }
     }
 
@@ -202,7 +170,6 @@ async function printTextNodes(
         newMarkdownSyntax,
         listItemCounters,
         isListItem,
-        uploadedImagesMap,
         processedImages,
         addedImages,
       );
