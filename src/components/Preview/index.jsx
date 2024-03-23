@@ -1,6 +1,5 @@
 import { forwardRef, useEffect, useState } from "react";
 import { marked } from "marked";
-
 import useDocxXmlStore from "../../store/useDocxXml";
 
 const Preview = forwardRef(({ markdownText, handlePreviewScroll }, ref) => {
@@ -8,21 +7,49 @@ const Preview = forwardRef(({ markdownText, handlePreviewScroll }, ref) => {
   const { docxFilesData } = useDocxXmlStore();
 
   useEffect(() => {
+    const renderer = new marked.Renderer();
+
+    renderer.image = function (href, title, text) {
+      const isHttpUrl =
+        href.startsWith("http://") || href.startsWith("https://");
+
+      if (isHttpUrl) {
+        return `<img src="${href}" alt="${text}" title="${title}" class="max-w-[96%] h-auto block mx-auto">`;
+      } else {
+        return `
+          <div class="image-container text-center">
+            <img src="${href}" alt="${text}" title="${title}" class="max-w-[96%] h-auto block mx-auto">
+            <div class="text-xs text-gray-600">프리뷰를 위해 표시된 이미지입니다.</div>
+          </div>
+        `;
+      }
+    };
+
+    marked.setOptions({
+      renderer,
+      breaks: true,
+    });
+
     const updateImagePaths = async () => {
       let updatedMarkdown = markdownText;
 
-      const imagePaths = markdownText.match(
-        /!\[Image]\(\.\/(word\/media\/[^)]+)\)/g,
-      );
+      const imagePaths = markdownText.match(/!\[.*?\]\((.*?)\)/g);
       if (imagePaths) {
-        for (const path of imagePaths) {
-          const filePath = path.match(/\(\/?\.\/(word\/media\/[^)]+)\)/)[1];
-          if (docxFilesData[filePath]) {
-            const blob = new Blob([docxFilesData[filePath]], {
-              type: "image/png",
-            });
-            const url = URL.createObjectURL(blob);
-            updatedMarkdown = updatedMarkdown.replace(`./${filePath}`, url);
+        for (const fullPath of imagePaths) {
+          const match = fullPath.match(/\((.*?)\)/);
+          const imagePath = match[1];
+          const isHttpUrl =
+            imagePath.startsWith("http://") || imagePath.startsWith("https://");
+
+          if (!isHttpUrl) {
+            const filePath = imagePath.match(/(word\/media\/[^)]+)/)[0];
+            if (docxFilesData[filePath]) {
+              const blob = new Blob([docxFilesData[filePath]], {
+                type: "image/png",
+              });
+              const url = URL.createObjectURL(blob);
+              updatedMarkdown = updatedMarkdown.replace(imagePath, url);
+            }
           }
         }
       }
@@ -34,9 +61,6 @@ const Preview = forwardRef(({ markdownText, handlePreviewScroll }, ref) => {
   }, [markdownText, docxFilesData]);
 
   const getMarkdownText = () => {
-    marked.setOptions({
-      breaks: true,
-    });
     const rawMarkup = marked.parse(processedMarkdown);
     return { __html: rawMarkup };
   };
