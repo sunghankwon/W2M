@@ -1,10 +1,13 @@
 import { useEffect, useState, useRef } from "react";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 
 import MarkdownEditor from "../MarkdownEditor";
 import Preview from "../Preview";
 import useDocxXmlStore from "../../store/useDocxXml";
 import useFileNameStore from "../../store/useFileName";
 import printTextNodes from "../../utils/printTextNodes";
+import transformQuotesInMarkdown from "../../utils/transformQuotesInMarkdown";
 
 import copyIcon from "../../assets/copy.png";
 import checkIcon from "../../assets/check.png";
@@ -20,29 +23,65 @@ function MarkdownConvert() {
   const previewRef = useRef(null);
   const editorRef = useRef(null);
   const isProgrammaticScroll = useRef(false);
+  const [isDownloadTriggered, setIsDownloadTriggered] = useState(false);
 
   useEffect(() => {
     async function convertToMarkdown() {
       if (docxXmlData !== "") {
         const xmlDoc = new DOMParser().parseFromString(docxXmlData, "text/xml");
         try {
-          const markdown = await printTextNodes(
+          let markdown = await printTextNodes(
             xmlDoc.documentElement,
             docxFilesData,
           );
 
+          markdown = await transformQuotesInMarkdown(markdown);
+
           setMarkdownText(markdown);
+          setOriginName(
+            fileName.substring(
+              0,
+              fileName.lastIndexOf(".docx") > -1
+                ? fileName.lastIndexOf(".docx")
+                : fileName.length,
+            ),
+          );
+
+          setIsDownloadTriggered(true);
         } catch (error) {
           console.error("Error converting to markdown:", error);
         }
       }
     }
-
-    setOriginName(
-      fileName.substring(0, fileName.indexOf(".docx") || fileName.length),
-    );
     convertToMarkdown();
   }, [docxXmlData, docxFilesData, fileName]);
+
+  useEffect(() => {
+    async function downloadAllFiles() {
+      if (
+        isDownloadTriggered &&
+        markdownText &&
+        Object.keys(docxFilesData).length > 0
+      ) {
+        const zip = new JSZip();
+        zip.file(`${originName}.md`, markdownText);
+        Object.entries(docxFilesData).forEach(([key, value]) => {
+          if (key.startsWith("word/media/")) {
+            zip.file(key, value, { binary: true });
+          }
+        });
+
+        const content = await zip.generateAsync({ type: "blob" });
+        saveAs(content, `${originName}.zip`);
+
+        setIsDownloadTriggered(false);
+      }
+    }
+
+    if (isDownloadTriggered) {
+      downloadAllFiles();
+    }
+  }, [isDownloadTriggered, markdownText, docxFilesData, originName]);
 
   const handleEditorScroll = (event) => {
     if (isProgrammaticScroll.current) {
@@ -95,14 +134,17 @@ function MarkdownConvert() {
       });
   };
 
-  const downloadMarkdownFile = () => {
-    const element = document.createElement("a");
-    const file = new Blob([markdownText], { type: "text/plain" });
-    element.href = URL.createObjectURL(file);
-    element.download = `${originName}.md`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+  const downloadMarkdownFile = async () => {
+    const zip = new JSZip();
+    zip.file(`${originName}.md`, markdownText);
+    Object.entries(docxFilesData).forEach(([key, value]) => {
+      if (key.startsWith("word/media/")) {
+        zip.file(key, value, { binary: true });
+      }
+    });
+
+    const content = await zip.generateAsync({ type: "blob" });
+    saveAs(content, `${originName}.zip`);
   };
 
   return (
