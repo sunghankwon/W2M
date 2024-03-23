@@ -10,6 +10,7 @@ function MarkdownEditor({
 }) {
   const historyRef = useRef([markdownText]);
   const historyIndexRef = useRef(0);
+  const lastEditPositionRef = useRef(0);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -41,6 +42,7 @@ function MarkdownEditor({
     historyIndexRef.current = newHistoryIndex;
     const previousValue = historyRef.current[newHistoryIndex];
     setMarkdownText(previousValue);
+    scrollToLastEditPosition();
   };
 
   const redo = () => {
@@ -50,6 +52,14 @@ function MarkdownEditor({
     historyIndexRef.current = newHistoryIndex;
     const nextValue = historyRef.current[newHistoryIndex];
     setMarkdownText(nextValue);
+    scrollToLastEditPosition();
+  };
+
+  const scrollToLastEditPosition = () => {
+    const textarea = editorRef.current;
+    if (textarea) {
+      textarea.scrollTop = lastEditPositionRef.current;
+    }
   };
 
   const handleChange = (event) => {
@@ -61,6 +71,7 @@ function MarkdownEditor({
       historyRef.current = historyRef.current.slice(0, newHistoryIndex);
       historyRef.current.push(newValue);
       historyIndexRef.current = newHistoryIndex;
+      lastEditPositionRef.current = event.target.scrollTop;
     }
   };
 
