@@ -63,16 +63,25 @@ function MarkdownConvert() {
         markdownText &&
         Object.keys(docxFilesData).length > 0
       ) {
-        const zip = new JSZip();
-        zip.file(`${originName}.md`, markdownText);
-        Object.entries(docxFilesData).forEach(([key, value]) => {
-          if (key.startsWith("word/media/")) {
-            zip.file(key, value, { binary: true });
-          }
-        });
+        const hasImages = Object.keys(docxFilesData).some((key) =>
+          key.startsWith("word/media/"),
+        );
 
-        const content = await zip.generateAsync({ type: "blob" });
-        saveAs(content, `${originName}.zip`);
+        if (hasImages) {
+          const zip = new JSZip();
+          zip.file(`${originName}.md`, markdownText);
+          Object.entries(docxFilesData).forEach(([key, value]) => {
+            if (key.startsWith("word/media/")) {
+              zip.file(key, value, { binary: true });
+            }
+          });
+
+          const content = await zip.generateAsync({ type: "blob" });
+          saveAs(content, `${originName}.zip`);
+        } else {
+          const blob = new Blob([markdownText], { type: "text/markdown" });
+          saveAs(blob, `${originName}.md`);
+        }
 
         setIsDownloadTriggered(false);
       }
@@ -135,16 +144,25 @@ function MarkdownConvert() {
   };
 
   const downloadMarkdownFile = async () => {
-    const zip = new JSZip();
-    zip.file(`${originName}.md`, markdownText);
-    Object.entries(docxFilesData).forEach(([key, value]) => {
-      if (key.startsWith("word/media/")) {
-        zip.file(key, value, { binary: true });
-      }
-    });
+    const hasImages = Object.keys(docxFilesData).some((key) =>
+      key.startsWith("word/media/"),
+    );
 
-    const content = await zip.generateAsync({ type: "blob" });
-    saveAs(content, `${originName}.zip`);
+    if (hasImages) {
+      const zip = new JSZip();
+      zip.file(`${originName}.md`, markdownText);
+      Object.entries(docxFilesData).forEach(([key, value]) => {
+        if (key.startsWith("word/media/")) {
+          zip.file(key, value, { binary: true });
+        }
+      });
+
+      const content = await zip.generateAsync({ type: "blob" });
+      saveAs(content, `${originName}.zip`);
+    } else {
+      const blob = new Blob([markdownText], { type: "text/markdown" });
+      saveAs(blob, `${originName}.md`);
+    }
   };
 
   return (
