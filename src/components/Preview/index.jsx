@@ -1,12 +1,43 @@
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { marked } from "marked";
 
+import useDocxXmlStore from "../../store/useDocxXml";
+
 const Preview = forwardRef(({ markdownText, handlePreviewScroll }, ref) => {
+  const [processedMarkdown, setProcessedMarkdown] = useState(markdownText);
+  const { docxFilesData } = useDocxXmlStore();
+
+  useEffect(() => {
+    const updateImagePaths = async () => {
+      let updatedMarkdown = markdownText;
+
+      const imagePaths = markdownText.match(
+        /!\[Image]\(\.\/(word\/media\/[^)]+)\)/g,
+      );
+      if (imagePaths) {
+        for (const path of imagePaths) {
+          const filePath = path.match(/\(\/?\.\/(word\/media\/[^)]+)\)/)[1];
+          if (docxFilesData[filePath]) {
+            const blob = new Blob([docxFilesData[filePath]], {
+              type: "image/png",
+            });
+            const url = URL.createObjectURL(blob);
+            updatedMarkdown = updatedMarkdown.replace(`./${filePath}`, url);
+          }
+        }
+      }
+
+      setProcessedMarkdown(updatedMarkdown);
+    };
+
+    updateImagePaths();
+  }, [markdownText, docxFilesData]);
+
   const getMarkdownText = () => {
     marked.setOptions({
       breaks: true,
     });
-    const rawMarkup = marked.parse(markdownText);
+    const rawMarkup = marked.parse(processedMarkdown);
     return { __html: rawMarkup };
   };
 
