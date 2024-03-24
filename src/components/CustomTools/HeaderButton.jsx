@@ -9,23 +9,22 @@ export function HeaderButton({
   const applyHeader = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;
-    const endPos = textarea.selectionEnd;
-    const selectedText = markdownText.substring(startPos, endPos);
+    const textBeforeSelection = markdownText.substring(0, startPos);
 
-    let newText;
+    const indexOfLastNewLine = textBeforeSelection.lastIndexOf("\n");
+    const startOfLine = indexOfLastNewLine === -1 ? 0 : indexOfLastNewLine + 1;
 
-    if (selectedText) {
-      newText =
-        markdownText.substring(0, startPos) +
-        `### ${selectedText}` +
-        markdownText.substring(endPos);
-    } else {
-      newText = `${markdownText.substring(0, startPos)}### ${markdownText.substring(startPos)}`;
-      setTimeout(() => setCursorPosition(startPos + 4), 0);
-    }
+    const newText =
+      markdownText.substring(0, startOfLine) +
+      `### ` +
+      markdownText.substring(startOfLine);
 
     setMarkdownText(newText);
     textarea.focus();
+
+    const newCursorPos = startOfLine + 4;
+    textarea.setSelectionRange(newCursorPos, newCursorPos);
+    setCursorPosition(newCursorPos);
   };
 
   return (
