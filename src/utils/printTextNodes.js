@@ -7,6 +7,7 @@ async function printTextNodes(
   markdown = "",
   depth = 0,
   headingLevel = "",
+  numberingLevel = "",
   markdownSyntax = "",
   listItemCounters = {},
   isListItem = false,
@@ -21,9 +22,10 @@ async function printTextNodes(
 
   let newHeadingLevel = headingLevel;
   let newMarkdownSyntax = markdownSyntax;
+  let newNumberingLevel = numberingLevel;
 
   if (node.nodeType === 3 && node.textContent.trim()) {
-    const content = `${headingLevel}${markdownSyntax}${node.textContent.trim()}${markdownSyntax.split("").reverse().join("").replace(">u<", "</u>")}`;
+    const content = `${headingLevel}${numberingLevel}${markdownSyntax}${node.textContent.trim()}${markdownSyntax.split("").reverse().join("").replace(">u<", "</u>")}`;
     markdown += isListItem || depth === 0 ? `${content}` : `${content} `;
   } else if (node.nodeType === 1) {
     if (node.nodeName === "w:p") {
@@ -79,7 +81,7 @@ async function printTextNodes(
                 : String.fromCharCode(96 + counter) + ".");
           }
 
-          markdown += prefix + " ";
+          newNumberingLevel = prefix + " ";
           isListItem = true;
         }
       }
@@ -104,6 +106,7 @@ async function printTextNodes(
             docxFilesData,
             linkMarkdown,
             depth + 1,
+            "",
             "",
             "",
             listItemCounters,
@@ -170,6 +173,7 @@ async function printTextNodes(
         "",
         depth + 1,
         newHeadingLevel,
+        newNumberingLevel,
         newMarkdownSyntax,
         listItemCounters,
         isListItem,
