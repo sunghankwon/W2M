@@ -13,12 +13,15 @@ import { NumberListButton } from "./NumberListButton";
 import { UnorderedListButton } from "./UnorderedListButton";
 import { TaskButton } from "./TaskButton";
 import { ImageButton } from "./ImageButton";
+import { TableButton } from "./TableButton";
+import { DividerButton } from "./DividerButton";
 
 export function Toolbar({ editorRef, markdownText, setMarkdownText }) {
   const setCursorPosition = (pos) => {
     const textarea = editorRef.current;
     textarea.setSelectionRange(pos, pos);
   };
+
   return (
     <div className="flex w-[706px] h-9 bg-gray-100 border">
       <HeaderButton
@@ -57,6 +60,11 @@ export function Toolbar({ editorRef, markdownText, setMarkdownText }) {
         setMarkdownText={setMarkdownText}
         setCursorPosition={setCursorPosition}
       />
+      <DividerButton
+        editorRef={editorRef}
+        markdownText={markdownText}
+        setMarkdownText={setMarkdownText}
+      />
       <CodeBlockButton
         editorRef={editorRef}
         markdownText={markdownText}
@@ -67,7 +75,6 @@ export function Toolbar({ editorRef, markdownText, setMarkdownText }) {
         editorRef={editorRef}
         markdownText={markdownText}
         setMarkdownText={setMarkdownText}
-        setCursorPosition={setCursorPosition}
       />
       <CapitalizeButton
         editorRef={editorRef}
@@ -106,7 +113,11 @@ export function Toolbar({ editorRef, markdownText, setMarkdownText }) {
         editorRef={editorRef}
         markdownText={markdownText}
         setMarkdownText={setMarkdownText}
-        setCursorPosition={setCursorPosition}
+      />
+      <TableButton
+        editorRef={editorRef}
+        markdownText={markdownText}
+        setMarkdownText={setMarkdownText}
       />
     </div>
   );
