@@ -8,23 +8,47 @@ export function ItalicButton({
 }) {
   const applyItalic = () => {
     const textarea = editorRef.current;
-    const startPos = textarea.selectionStart;
-    const endPos = textarea.selectionEnd;
+    let startPos = textarea.selectionStart;
+    let endPos = textarea.selectionEnd;
+    const textBefore = markdownText.substring(0, startPos);
+    const textAfter = markdownText.substring(endPos);
     const selectedText = markdownText.substring(startPos, endPos);
 
     let newText;
+    const hasItalicBefore = textBefore.endsWith("_");
+    const hasItalicAfter = textAfter.startsWith("_");
 
-    if (selectedText) {
+    if (hasItalicBefore && hasItalicAfter && selectedText) {
       newText =
-        markdownText.substring(0, startPos) +
-        `_${selectedText}_` +
-        markdownText.substring(endPos);
+        markdownText.substring(0, startPos - 1) +
+        selectedText +
+        markdownText.substring(endPos + 1);
+      startPos -= 1;
+      endPos -= 1;
+    } else if (!hasItalicBefore && !hasItalicAfter && selectedText) {
+      if (
+        selectedText.startsWith("_") &&
+        selectedText.endsWith("_") &&
+        selectedText.length > 2
+      ) {
+        const trimmedText = selectedText.substring(1, selectedText.length - 1);
+        newText =
+          markdownText.substring(0, startPos) +
+          trimmedText +
+          markdownText.substring(endPos);
+      } else {
+        newText =
+          markdownText.substring(0, startPos) +
+          `_${selectedText}_` +
+          markdownText.substring(endPos);
+      }
     } else {
       newText = `${markdownText.substring(0, startPos)}__${markdownText.substring(startPos)}`;
       setTimeout(() => setCursorPosition(startPos + 1), 0);
     }
 
     setMarkdownText(newText);
+    textarea.setSelectionRange(startPos, endPos);
     textarea.focus();
   };
 
