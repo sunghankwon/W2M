@@ -8,23 +8,47 @@ export function UnderlineButton({
 }) {
   const applyUnderLine = () => {
     const textarea = editorRef.current;
-    const startPos = textarea.selectionStart;
-    const endPos = textarea.selectionEnd;
+    let startPos = textarea.selectionStart;
+    let endPos = textarea.selectionEnd;
+    const textBefore = markdownText.substring(0, startPos);
+    const textAfter = markdownText.substring(endPos);
     const selectedText = markdownText.substring(startPos, endPos);
 
     let newText;
+    const hasUnderLineBefore = textBefore.endsWith("<u>");
+    const hasUnderLineAfter = textAfter.startsWith("</u>");
 
-    if (selectedText) {
+    if (hasUnderLineBefore && hasUnderLineAfter && selectedText) {
       newText =
-        markdownText.substring(0, startPos) +
-        `<u>${selectedText}</u>` +
-        markdownText.substring(endPos);
+        markdownText.substring(0, startPos - 3) +
+        selectedText +
+        markdownText.substring(endPos + 4);
+      startPos -= 3;
+      endPos -= 4;
+    } else if (!hasUnderLineBefore && !hasUnderLineAfter && selectedText) {
+      if (
+        selectedText.startsWith("<u>") &&
+        selectedText.endsWith("</u>") &&
+        selectedText.length > 7
+      ) {
+        const trimmedText = selectedText.substring(3, selectedText.length - 4);
+        newText =
+          markdownText.substring(0, startPos) +
+          trimmedText +
+          markdownText.substring(endPos);
+      } else {
+        newText =
+          markdownText.substring(0, startPos) +
+          `<u>${selectedText}</u>` +
+          markdownText.substring(endPos);
+      }
     } else {
       newText = `${markdownText.substring(0, startPos)}<u></u>${markdownText.substring(startPos)}`;
       setTimeout(() => setCursorPosition(startPos + 3), 0);
     }
 
     setMarkdownText(newText);
+    textarea.setSelectionRange(startPos, endPos);
     textarea.focus();
   };
 
