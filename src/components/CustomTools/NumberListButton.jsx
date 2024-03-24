@@ -20,7 +20,12 @@ export function NumberListButton({
       let number = 0;
       for (let text of textArray) {
         number++;
-        numberText += `${number}. ${text}\n`;
+        const headerMatch = text.match(/^(#+)(\s)?/);
+        if (headerMatch) {
+          numberText += `${text.substring(0, headerMatch[0].length)} ${number}. ${text.substring(headerMatch[0].length)}\n`;
+        } else {
+          numberText += `${number}. ${text}\n`;
+        }
       }
 
       newText =
@@ -28,8 +33,33 @@ export function NumberListButton({
         numberText +
         markdownText.substring(endPos);
     } else {
-      newText = `${markdownText.substring(0, startPos)}1. ${markdownText.substring(startPos)}`;
-      setTimeout(() => setCursorPosition(startPos + 3), 0);
+      const beforeText = markdownText.substring(0, startPos);
+      const afterText = markdownText.substring(startPos);
+      const startOfLine = beforeText.lastIndexOf("\n") + 1;
+      const endOfLine =
+        afterText.indexOf("\n") === -1
+          ? markdownText.length
+          : startPos + afterText.indexOf("\n");
+      const lineText = markdownText.substring(startOfLine, endOfLine);
+
+      const headerMatch = lineText.match(/^(#+\s?)/);
+      let newLineText;
+      if (headerMatch) {
+        newLineText = lineText.replace(headerMatch[0], `${headerMatch[0]}1. `);
+      } else {
+        newLineText = `1. ${lineText}`;
+      }
+
+      newText =
+        markdownText.substring(0, startOfLine) +
+        newLineText +
+        markdownText.substring(endOfLine);
+
+      const cursorPositionOffset = headerMatch ? headerMatch[0].length + 3 : 3;
+      setTimeout(
+        () => setCursorPosition(startOfLine + cursorPositionOffset),
+        0,
+      );
     }
 
     setMarkdownText(newText);
