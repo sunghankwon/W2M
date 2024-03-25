@@ -82,10 +82,10 @@ function MarkdownConvert() {
           });
 
           const content = await zip.generateAsync({ type: "blob" });
-          //saveAs(content, `${originName}.zip`);
+          saveAs(content, `${originName}.zip`);
         } else {
           const blob = new Blob([markdownText], { type: "text/markdown" });
-          //saveAs(blob, `${originName}.md`);
+          saveAs(blob, `${originName}.md`);
         }
 
         setIsDownloadTriggered(false);
@@ -173,7 +173,7 @@ function MarkdownConvert() {
   return (
     <>
       <div className="flex items-start justify-center">
-        <div className="flex flex-col mr-8">
+        <div className="flex flex-col mr-8 editor-container">
           <h2 className="text-xl">{originName}.md</h2>
           <div className="flex justify-between w-[706px] bg-gray-300">
             <span className="flex items-center flex-grow ml-4">markdown</span>
