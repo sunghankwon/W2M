@@ -1,14 +1,11 @@
 import { useState } from "react";
 
 import { InputModal } from "./InputModal";
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import linkIcon from "../../assets/link.png";
 
-export function LinkButton({
-  editorRef,
-  markdownText,
-  setMarkdownText,
-  updateHistory,
-}) {
+export function LinkButton({ editorRef, updateHistory }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const applyLink = (url) => {

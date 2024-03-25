@@ -1,12 +1,13 @@
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import numberIcon from "../../assets/number.png";
 
 export function NumberListButton({
   editorRef,
-  markdownText,
-  setMarkdownText,
   setCursorPosition,
   updateHistory,
 }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
+
   const applyNumbering = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;

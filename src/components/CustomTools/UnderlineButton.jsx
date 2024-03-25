@@ -1,12 +1,11 @@
 import { useEffect } from "react";
+
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import underlineIcon from "../../assets/underline.png";
 
-export function UnderlineButton({
-  editorRef,
-  markdownText,
-  setMarkdownText,
-  updateHistory,
-}) {
+export function UnderlineButton({ editorRef, updateHistory }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
+
   const applyUnderLine = () => {
     const textarea = editorRef.current;
     let startPos = textarea.selectionStart;

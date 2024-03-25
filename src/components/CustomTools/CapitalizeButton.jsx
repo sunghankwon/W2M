@@ -1,11 +1,9 @@
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import capitalizeIcon from "../../assets/capitalize.png";
 
-export function CapitalizeButton({
-  editorRef,
-  markdownText,
-  setMarkdownText,
-  updateHistory,
-}) {
+export function CapitalizeButton({ editorRef, updateHistory }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
+
   const applyCapitalizeWords = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;

@@ -1,12 +1,9 @@
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import headerIcon from "../../assets/header.png";
 
-export function HeaderButton({
-  editorRef,
-  markdownText,
-  setMarkdownText,
-  setCursorPosition,
-  updateHistory,
-}) {
+export function HeaderButton({ editorRef, setCursorPosition, updateHistory }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
+
   const applyHeader = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;

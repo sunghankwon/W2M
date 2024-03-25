@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
@@ -6,6 +7,7 @@ import MarkdownEditor from "../MarkdownEditor";
 import Preview from "../Preview";
 import useDocxXmlStore from "../../store/useDocxXml";
 import useFileNameStore from "../../store/useFileName";
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import printTextNodes from "../../utils/printTextNodes";
 import transformQuotesInMarkdown from "../../utils/transformQuotesInMarkdown";
 
@@ -14,16 +16,17 @@ import checkIcon from "../../assets/check.png";
 import downloadIcon from "../../assets/download.png";
 
 function MarkdownConvert() {
-  const [markdownText, setMarkdownText] = useState("");
   const [originName, setOriginName] = useState("");
   const [buttonText, setButtonText] = useState("Copy code");
   const [iconSrc, setIconSrc] = useState(copyIcon);
   const { fileName } = useFileNameStore();
   const { docxXmlData, docxFilesData } = useDocxXmlStore();
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
   const previewRef = useRef(null);
   const editorRef = useRef(null);
   const isProgrammaticScroll = useRef(false);
   const [isDownloadTriggered, setIsDownloadTriggered] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function convertToMarkdown() {
@@ -51,6 +54,8 @@ function MarkdownConvert() {
         } catch (error) {
           console.error("Error converting to markdown:", error);
         }
+      } else {
+        navigate("/");
       }
     }
     convertToMarkdown();
@@ -77,10 +82,10 @@ function MarkdownConvert() {
           });
 
           const content = await zip.generateAsync({ type: "blob" });
-          saveAs(content, `${originName}.zip`);
+          //saveAs(content, `${originName}.zip`);
         } else {
           const blob = new Blob([markdownText], { type: "text/markdown" });
-          saveAs(blob, `${originName}.md`);
+          //saveAs(blob, `${originName}.md`);
         }
 
         setIsDownloadTriggered(false);
@@ -191,19 +196,14 @@ function MarkdownConvert() {
           </div>
 
           <MarkdownEditor
-            markdownText={markdownText}
-            setMarkdownText={setMarkdownText}
             handleEditorScroll={handleEditorScroll}
             editorRef={editorRef}
+            previewRef={previewRef}
           />
         </div>
         <div className="flex flex-col">
           <h2 className="text-xl">Preview</h2>
-          <Preview
-            markdownText={markdownText}
-            ref={previewRef}
-            handlePreviewScroll={handlePreviewScroll}
-          />
+          <Preview ref={previewRef} handlePreviewScroll={handlePreviewScroll} />
         </div>
       </div>
     </>

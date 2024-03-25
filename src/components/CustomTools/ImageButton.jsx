@@ -1,15 +1,12 @@
 import { useState } from "react";
 
 import { InputModal } from "./InputModal";
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import imageIcon from "../../assets/image.png";
 
-export function ImageButton({
-  editorRef,
-  markdownText,
-  setMarkdownText,
-  updateHistory,
-}) {
+export function ImageButton({ editorRef, updateHistory }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
 
   const applyImage = (url) => {
     const textarea = editorRef.current;

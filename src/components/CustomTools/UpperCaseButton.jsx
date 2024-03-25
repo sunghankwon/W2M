@@ -1,11 +1,9 @@
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import uppercaseIcon from "../../assets/uppercase.png";
 
-export function UpperCaseButton({
-  editorRef,
-  markdownText,
-  setMarkdownText,
-  updateHistory,
-}) {
+export function UpperCaseButton({ editorRef, updateHistory }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
+
   const applyUppercase = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;

@@ -1,13 +1,11 @@
 import React, { useEffect } from "react";
+
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import italicIcon from "../../assets/italic.png";
 
-export function ItalicButton({
-  editorRef,
-  markdownText,
-  setMarkdownText,
-  setCursorPosition,
-  updateHistory,
-}) {
+export function ItalicButton({ editorRef, setCursorPosition, updateHistory }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
+
   const applyItalic = () => {
     const textarea = editorRef.current;
     let startPos = textarea.selectionStart;

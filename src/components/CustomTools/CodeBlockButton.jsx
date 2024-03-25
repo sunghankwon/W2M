@@ -1,12 +1,13 @@
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import codeIcon from "../../assets/code.png";
 
 export function CodeBlockButton({
   editorRef,
-  markdownText,
-  setMarkdownText,
   setCursorPosition,
   updateHistory,
 }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
+
   const applyCodeBlock = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;

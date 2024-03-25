@@ -1,14 +1,10 @@
 import { useEffect, useRef } from "react";
 
 import { Toolbar } from "../CustomTools/Toolbar";
+import useMarkdownTextStore from "../../store/useMarkdownText";
 
-function MarkdownEditor({
-  markdownText,
-  setMarkdownText,
-  handleEditorScroll,
-  editorRef,
-  previewRef,
-}) {
+function MarkdownEditor({ handleEditorScroll, editorRef, previewRef }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
   const historyRef = useRef([markdownText]);
   const historyIndexRef = useRef(0);
   const lastEditPositionRef = useRef(0);
@@ -95,12 +91,7 @@ function MarkdownEditor({
 
   return (
     <>
-      <Toolbar
-        editorRef={editorRef}
-        markdownText={markdownText}
-        setMarkdownText={setMarkdownText}
-        updateHistory={updateHistory}
-      />
+      <Toolbar editorRef={editorRef} updateHistory={updateHistory} />
       <textarea
         value={markdownText}
         onChange={handleChange}

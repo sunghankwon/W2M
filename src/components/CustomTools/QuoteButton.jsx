@@ -1,12 +1,9 @@
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import quoteIcon from "../../assets/quote.png";
 
-export function QuoteButton({
-  editorRef,
-  markdownText,
-  setMarkdownText,
-  setCursorPosition,
-  updateHistory,
-}) {
+export function QuoteButton({ editorRef, setCursorPosition, updateHistory }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
+
   const applyQuote = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;

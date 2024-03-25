@@ -1,11 +1,9 @@
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import dividerLineIcon from "../../assets/line.png";
 
-export function DividerButton({
-  editorRef,
-  markdownText,
-  setMarkdownText,
-  updateHistory,
-}) {
+export function DividerButton({ editorRef, updateHistory }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
+
   const applyDivider = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;

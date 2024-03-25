@@ -1,13 +1,10 @@
 import React, { useEffect } from "react";
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import boldIcon from "../../assets/Bold.png";
 
-export function BoldButton({
-  editorRef,
-  markdownText,
-  setMarkdownText,
-  setCursorPosition,
-  updateHistory,
-}) {
+export function BoldButton({ editorRef, setCursorPosition, updateHistory }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
+
   const applyBold = () => {
     const textarea = editorRef.current;
     let startPos = textarea.selectionStart;

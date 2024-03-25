@@ -1,13 +1,15 @@
 import { useEffect } from "react";
+
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import strikethroughIcon from "../../assets/strikethrough.png";
 
 export function StrikethroughButton({
   editorRef,
-  markdownText,
-  setMarkdownText,
   setCursorPosition,
   updateHistory,
 }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
+
   const applyStrikethrough = () => {
     const textarea = editorRef.current;
     let startPos = textarea.selectionStart;

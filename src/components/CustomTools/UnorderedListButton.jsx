@@ -1,12 +1,13 @@
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import unorderedIcon from "../../assets/unordered.png";
 
 export function UnorderedListButton({
   editorRef,
-  markdownText,
-  setMarkdownText,
   setCursorPosition,
   updateHistory,
 }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
+
   const applyUnorderedList = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;

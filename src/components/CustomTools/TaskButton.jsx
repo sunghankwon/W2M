@@ -1,12 +1,9 @@
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import taskIcon from "../../assets/task.png";
 
-export function TaskButton({
-  editorRef,
-  markdownText,
-  setMarkdownText,
-  setCursorPosition,
-  updateHistory,
-}) {
+export function TaskButton({ editorRef, setCursorPosition, updateHistory }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
+
   const applyTaskList = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;

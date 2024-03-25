@@ -1,12 +1,9 @@
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import tableIcon from "../../assets/table.png";
 
-export function TableButton({
-  editorRef,
-  markdownText,
-  setMarkdownText,
-  setCursorPosition,
-  updateHistory,
-}) {
+export function TableButton({ editorRef, setCursorPosition, updateHistory }) {
+  const { markdownText, setMarkdownText } = useMarkdownTextStore();
+
   const applyTable = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;

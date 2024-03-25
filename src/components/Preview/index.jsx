@@ -1,8 +1,11 @@
 import { forwardRef, useEffect, useState } from "react";
 import { marked } from "marked";
+
+import useMarkdownTextStore from "../../store/useMarkdownText";
 import useDocxXmlStore from "../../store/useDocxXml";
 
-const Preview = forwardRef(({ markdownText, handlePreviewScroll }, ref) => {
+const Preview = forwardRef(({ handlePreviewScroll }, ref) => {
+  const { markdownText } = useMarkdownTextStore();
   const [processedMarkdown, setProcessedMarkdown] = useState(markdownText);
   const { docxFilesData } = useDocxXmlStore();
 
