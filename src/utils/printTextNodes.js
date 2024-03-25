@@ -48,8 +48,14 @@ async function printTextNodes(
           case "Heading3":
             newHeadingLevel = "### ";
             break;
-          default:
+          case "Heading4":
             newHeadingLevel = "#### ";
+            break;
+          case "Heading5":
+            newHeadingLevel = "##### ";
+            break;
+          default:
+            newHeadingLevel = "###### ";
             break;
         }
       }
@@ -151,6 +157,11 @@ async function printTextNodes(
       markdown += rowsMarkdown.join("\n") + "\n";
 
       return markdown;
+    } else if (node.nodeName === "w:pict") {
+      const rectElements = node.getElementsByTagName("v:rect");
+      if (rectElements.length > 0) {
+        markdown += "---";
+      }
     } else if (node.nodeName === "wp:inline" || node.nodeName === "w:drawing") {
       const blipElements = node.getElementsByTagName("a:blip");
       for (let blip of blipElements) {
