@@ -175,7 +175,7 @@ function MarkdownConvert() {
       <div className="flex items-start justify-center">
         <div className="flex flex-col mr-8 editor-container">
           <h2 className="text-xl">{originName}.md</h2>
-          <div className="flex justify-between w-[706px] bg-gray-300 editor-toolbar">
+          <div className="flex justify-between w-[706px] border rounded-t-md bg-gray-300 editor-toolbar">
             <span className="flex items-center flex-grow ml-4">markdown</span>
             <div className="flex">
               <button

@@ -32,14 +32,7 @@ function MarkdownEditor({ handleEditorScroll, editorRef, previewRef }) {
       textarea.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
-  /*
-  useEffect(() => {
-    const textarea = editorRef.current;
-    if (textarea) {
-      textarea.scrollTop = lastEditPositionRef.current;
-    }
-  }, [markdownText]);
-*/
+
   const undo = () => {
     const newHistoryIndex = historyIndexRef.current - 1;
     if (newHistoryIndex < 0) return;
@@ -117,7 +110,7 @@ function MarkdownEditor({ handleEditorScroll, editorRef, previewRef }) {
         ref={editorRef}
         rows="23"
         cols="80"
-        className="p-2 mr-10 border border-gray-300 rounded-lg focus:border-gray-300 focus:outline-none editor-textarea"
+        className="p-2 mr-10 border border-gray-300 rounded-b-lg focus:border-gray-300 focus:outline-none editor-textarea"
       />
     </>
   );

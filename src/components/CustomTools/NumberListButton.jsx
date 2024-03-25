@@ -38,7 +38,7 @@ export function NumberListButton({
         markdownText.substring(endPos);
 
       setTimeout(() => {
-        setCursorPosition(startPos + numberText.length - 1); // 마지막 개행 문자 뒤에 커서를 위치시키기 위해 -1을 합니다.
+        setCursorPosition(startPos + numberText.length - 1);
       }, 0);
     } else {
       const beforeText = markdownText.substring(0, startPos);
