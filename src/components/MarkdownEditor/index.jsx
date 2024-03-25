@@ -32,7 +32,14 @@ function MarkdownEditor({ handleEditorScroll, editorRef, previewRef }) {
       textarea.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
-
+  /*
+  useEffect(() => {
+    const textarea = editorRef.current;
+    if (textarea) {
+      textarea.scrollTop = lastEditPositionRef.current;
+    }
+  }, [markdownText]);
+*/
   const undo = () => {
     const newHistoryIndex = historyIndexRef.current - 1;
     if (newHistoryIndex < 0) return;
@@ -61,17 +68,28 @@ function MarkdownEditor({ handleEditorScroll, editorRef, previewRef }) {
 
   const handleChange = (event) => {
     const newValue = event.target.value;
+    const currentScrollTop = editorRef.current.scrollTop;
+
     setMarkdownText(newValue);
 
     setTimeout(() => {
       if (!editorRef.current || !previewRef.current) return;
 
+      editorRef.current.scrollTop = currentScrollTop;
+
       const { scrollTop, scrollHeight, clientHeight } = editorRef.current;
-      const previewScrollHeight =
-        previewRef.current.scrollHeight - previewRef.current.clientHeight + 10;
-      const scrollRatio = scrollTop / (scrollHeight - clientHeight);
-      previewRef.current.scrollTop = previewScrollHeight * scrollRatio;
-    }, 2);
+      const isWithinBottom10Percent =
+        scrollTop + clientHeight >= scrollHeight * 0.8;
+
+      if (isWithinBottom10Percent) {
+        const previewScrollHeight =
+          previewRef.current.scrollHeight -
+          previewRef.current.clientHeight +
+          10;
+        const scrollRatio = scrollTop / (scrollHeight - clientHeight);
+        previewRef.current.scrollTop = previewScrollHeight * scrollRatio;
+      }
+    }, 0);
 
     if (newValue.endsWith(" ") || newValue.endsWith("\n")) {
       const newHistoryIndex = historyIndexRef.current + 1;
