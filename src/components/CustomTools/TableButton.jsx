@@ -10,7 +10,7 @@ export function TableButton({ editorRef, setCursorPosition, updateHistory }) {
 
     const table = `| title1 | title2 | title3 |\n| ---- | ---- | ---- |\n| 1 | 2 | 3 |\n| a | b | c |\n| i | ii | iii |\n`;
 
-    updateHistory(markdownTextupdateHistory);
+    updateHistory(markdownText);
 
     const newText = `${markdownText.substring(0, startPos)}${table}${markdownText.substring(startPos)}`;
 
