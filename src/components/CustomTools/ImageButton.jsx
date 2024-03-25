@@ -3,15 +3,23 @@ import { useState } from "react";
 import { InputModal } from "./InputModal";
 import imageIcon from "../../assets/image.png";
 
-export function ImageButton({ editorRef, markdownText, setMarkdownText }) {
+export function ImageButton({
+  editorRef,
+  markdownText,
+  setMarkdownText,
+  updateHistory,
+}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const applyImage = (url) => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;
 
+    updateHistory(markdownText);
+
     const newText = `${markdownText.substring(0, startPos)}![](${url})${markdownText.substring(startPos)}`;
 
+    updateHistory(newText);
     setMarkdownText(newText);
     textarea.focus();
   };

@@ -5,6 +5,7 @@ export function CodeBlockButton({
   markdownText,
   setMarkdownText,
   setCursorPosition,
+  updateHistory,
 }) {
   const applyCodeBlock = () => {
     const textarea = editorRef.current;
@@ -13,6 +14,8 @@ export function CodeBlockButton({
     const selectedText = markdownText.substring(startPos, endPos);
 
     let newText;
+
+    updateHistory(markdownText);
 
     if (selectedText) {
       newText =
@@ -24,6 +27,7 @@ export function CodeBlockButton({
       setTimeout(() => setCursorPosition(startPos + 4), 0);
     }
 
+    updateHistory(newText);
     setMarkdownText(newText);
     textarea.focus();
   };

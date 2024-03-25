@@ -6,6 +6,7 @@ export function BoldButton({
   markdownText,
   setMarkdownText,
   setCursorPosition,
+  updateHistory,
 }) {
   const applyBold = () => {
     const textarea = editorRef.current;
@@ -17,13 +18,14 @@ export function BoldButton({
 
     const leadingSpaces = selectedText.match(/^(\s*)/)[0];
     const trailingSpaces = selectedText.match(/(\s*)$/)[0];
-
     selectedText = selectedText.trim();
 
     let newText;
 
     const hasBoldBefore = textBefore.endsWith("**");
     const hasBoldAfter = textAfter.startsWith("**");
+
+    updateHistory(markdownText);
 
     if (hasBoldBefore && hasBoldAfter && selectedText) {
       newText =
@@ -80,6 +82,8 @@ export function BoldButton({
       newText = `${markdownText.substring(0, startPos)}****${markdownText.substring(startPos)}`;
       setTimeout(() => setCursorPosition(startPos + 2), 0);
     }
+
+    updateHistory(newText);
 
     setMarkdownText(newText);
     textarea.setSelectionRange(startPos, endPos);

@@ -6,6 +6,7 @@ export function ItalicButton({
   markdownText,
   setMarkdownText,
   setCursorPosition,
+  updateHistory,
 }) {
   const applyItalic = () => {
     const textarea = editorRef.current;
@@ -22,6 +23,8 @@ export function ItalicButton({
     let newText;
     const hasItalicBefore = textBefore.endsWith("_");
     const hasItalicAfter = textAfter.startsWith("_");
+
+    updateHistory(markdownText);
 
     if (hasItalicBefore && hasItalicAfter && selectedText) {
       newText =
@@ -77,6 +80,7 @@ export function ItalicButton({
       setTimeout(() => setCursorPosition(startPos + 1), 0);
     }
 
+    updateHistory(newText);
     setMarkdownText(newText);
     textarea.setSelectionRange(startPos, endPos);
     textarea.focus();

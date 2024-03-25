@@ -5,6 +5,7 @@ export function QuoteButton({
   markdownText,
   setMarkdownText,
   setCursorPosition,
+  updateHistory,
 }) {
   const applyQuote = () => {
     const textarea = editorRef.current;
@@ -14,6 +15,8 @@ export function QuoteButton({
 
     let newText;
     let quoteText = "";
+
+    updateHistory(markdownText);
 
     if (selectedText) {
       const textArray = selectedText.split("\n");
@@ -35,6 +38,7 @@ export function QuoteButton({
       setTimeout(() => setCursorPosition(startPos + 2), 0);
     }
 
+    updateHistory(newText);
     setMarkdownText(newText);
     textarea.focus();
   };

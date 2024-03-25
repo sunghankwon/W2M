@@ -6,6 +6,7 @@ export function StrikethroughButton({
   markdownText,
   setMarkdownText,
   setCursorPosition,
+  updateHistory,
 }) {
   const applyStrikethrough = () => {
     const textarea = editorRef.current;
@@ -23,6 +24,8 @@ export function StrikethroughButton({
 
     const hasStrikethroughBefore = textBefore.endsWith("~~");
     const hasStrikethroughAfter = textAfter.startsWith("~~");
+
+    updateHistory(markdownText);
 
     if (hasStrikethroughBefore && hasStrikethroughAfter && selectedText) {
       newText =
@@ -84,6 +87,7 @@ export function StrikethroughButton({
       setTimeout(() => setCursorPosition(startPos + 2), 0);
     }
 
+    updateHistory(newText);
     setMarkdownText(newText);
     textarea.setSelectionRange(startPos, endPos);
     textarea.focus();

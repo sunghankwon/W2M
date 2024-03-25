@@ -5,6 +5,7 @@ export function HeaderButton({
   markdownText,
   setMarkdownText,
   setCursorPosition,
+  updateHistory,
 }) {
   const applyHeader = () => {
     const textarea = editorRef.current;
@@ -22,6 +23,8 @@ export function HeaderButton({
 
     const headerMatch = currentLineText.match(/^(#{1,6})\s/);
     let newText;
+
+    updateHistory(markdownText);
 
     if (headerMatch) {
       const currentHeaderLevel = headerMatch[1].length;
@@ -43,6 +46,8 @@ export function HeaderButton({
         "### " +
         markdownText.substring(startOfLine);
     }
+
+    updateHistory(newText);
 
     setMarkdownText(newText);
     textarea.focus();

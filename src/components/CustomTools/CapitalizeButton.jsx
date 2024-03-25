@@ -1,6 +1,11 @@
 import capitalizeIcon from "../../assets/capitalize.png";
 
-export function CapitalizeButton({ editorRef, markdownText, setMarkdownText }) {
+export function CapitalizeButton({
+  editorRef,
+  markdownText,
+  setMarkdownText,
+  updateHistory,
+}) {
   const applyCapitalizeWords = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;
@@ -13,6 +18,8 @@ export function CapitalizeButton({ editorRef, markdownText, setMarkdownText }) {
 
     let capitalizedText;
     let newText;
+
+    updateHistory(markdownText);
 
     if (selectedText) {
       capitalizedText = selectedText
@@ -28,6 +35,7 @@ export function CapitalizeButton({ editorRef, markdownText, setMarkdownText }) {
         markdownText.substring(endPos);
     }
 
+    updateHistory(newText);
     setMarkdownText(newText);
 
     const newCursorPos = startPos + capitalizedText.length;

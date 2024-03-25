@@ -7,6 +7,7 @@ function MarkdownEditor({
   setMarkdownText,
   handleEditorScroll,
   editorRef,
+  previewRef,
 }) {
   const historyRef = useRef([markdownText]);
   const historyIndexRef = useRef(0);
@@ -66,6 +67,16 @@ function MarkdownEditor({
     const newValue = event.target.value;
     setMarkdownText(newValue);
 
+    setTimeout(() => {
+      if (!editorRef.current || !previewRef.current) return;
+
+      const { scrollTop, scrollHeight, clientHeight } = editorRef.current;
+      const previewScrollHeight =
+        previewRef.current.scrollHeight - previewRef.current.clientHeight + 10;
+      const scrollRatio = scrollTop / (scrollHeight - clientHeight);
+      previewRef.current.scrollTop = previewScrollHeight * scrollRatio;
+    }, 2);
+
     if (newValue.endsWith(" ") || newValue.endsWith("\n")) {
       const newHistoryIndex = historyIndexRef.current + 1;
       historyRef.current = historyRef.current.slice(0, newHistoryIndex);
@@ -75,12 +86,20 @@ function MarkdownEditor({
     }
   };
 
+  const updateHistory = (newText) => {
+    const newHistoryIndex = historyIndexRef.current + 1;
+    historyRef.current = historyRef.current.slice(0, newHistoryIndex);
+    historyRef.current.push(newText);
+    historyIndexRef.current = newHistoryIndex;
+  };
+
   return (
     <>
       <Toolbar
         editorRef={editorRef}
         markdownText={markdownText}
         setMarkdownText={setMarkdownText}
+        updateHistory={updateHistory}
       />
       <textarea
         value={markdownText}

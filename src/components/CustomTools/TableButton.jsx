@@ -5,6 +5,7 @@ export function TableButton({
   markdownText,
   setMarkdownText,
   setCursorPosition,
+  updateHistory,
 }) {
   const applyTable = () => {
     const textarea = editorRef.current;
@@ -12,12 +13,15 @@ export function TableButton({
 
     const table = `| title1 | title2 | title3 |\n| ---- | ---- | ---- |\n| 1 | 2 | 3 |\n| a | b | c |\n| i | ii | iii |\n`;
 
+    updateHistory(markdownTextupdateHistory);
+
     const newText = `${markdownText.substring(0, startPos)}${table}${markdownText.substring(startPos)}`;
 
     setTimeout(() => {
       setCursorPosition(startPos + table.length);
     }, 0);
 
+    updateHistory(newText);
     setMarkdownText(newText);
     textarea.focus();
   };

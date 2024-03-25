@@ -1,6 +1,11 @@
 import uppercaseIcon from "../../assets/uppercase.png";
 
-export function UpperCaseButton({ editorRef, markdownText, setMarkdownText }) {
+export function UpperCaseButton({
+  editorRef,
+  markdownText,
+  setMarkdownText,
+  updateHistory,
+}) {
   const applyUppercase = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;
@@ -11,12 +16,15 @@ export function UpperCaseButton({ editorRef, markdownText, setMarkdownText }) {
       return;
     }
 
+    updateHistory(markdownText);
+
     const uppercaseText = selectedText.toUpperCase();
     const newText =
       markdownText.substring(0, startPos) +
       uppercaseText +
       markdownText.substring(endPos);
 
+    updateHistory(newText);
     setMarkdownText(newText);
 
     const newCursorPos = startPos + uppercaseText.length;

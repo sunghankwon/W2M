@@ -1,7 +1,12 @@
 import { useEffect } from "react";
 import underlineIcon from "../../assets/underline.png";
 
-export function UnderlineButton({ editorRef, markdownText, setMarkdownText }) {
+export function UnderlineButton({
+  editorRef,
+  markdownText,
+  setMarkdownText,
+  updateHistory,
+}) {
   const applyUnderLine = () => {
     const textarea = editorRef.current;
     let startPos = textarea.selectionStart;
@@ -17,6 +22,8 @@ export function UnderlineButton({ editorRef, markdownText, setMarkdownText }) {
     let newText;
     const hasUnderLineBefore = textBefore.endsWith("<u>");
     const hasUnderLineAfter = textAfter.startsWith("</u>");
+
+    updateHistory(markdownText);
 
     if (hasUnderLineBefore && hasUnderLineAfter && selectedText) {
       newText =
@@ -68,6 +75,7 @@ export function UnderlineButton({ editorRef, markdownText, setMarkdownText }) {
       endPos = startPos + 3;
     }
 
+    updateHistory(newText);
     setMarkdownText(newText);
     setTimeout(() => textarea.setSelectionRange(endPos, endPos), 0);
     textarea.focus();

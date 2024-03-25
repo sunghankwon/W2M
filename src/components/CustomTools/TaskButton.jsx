@@ -5,6 +5,7 @@ export function TaskButton({
   markdownText,
   setMarkdownText,
   setCursorPosition,
+  updateHistory,
 }) {
   const applyTaskList = () => {
     const textarea = editorRef.current;
@@ -14,6 +15,8 @@ export function TaskButton({
 
     let newText;
     let taskText = "";
+
+    updateHistory(markdownText);
 
     if (selectedText) {
       const textArray = selectedText.split("\n");
@@ -64,6 +67,7 @@ export function TaskButton({
       );
     }
 
+    updateHistory(newText);
     setMarkdownText(newText);
     textarea.focus();
   };

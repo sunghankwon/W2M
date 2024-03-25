@@ -5,6 +5,7 @@ export function UnorderedListButton({
   markdownText,
   setMarkdownText,
   setCursorPosition,
+  updateHistory,
 }) {
   const applyUnorderedList = () => {
     const textarea = editorRef.current;
@@ -14,6 +15,8 @@ export function UnorderedListButton({
 
     let newText;
     let unorderdText = "";
+
+    updateHistory(markdownText);
 
     if (selectedText) {
       const textArray = selectedText.split("\n");
@@ -61,6 +64,7 @@ export function UnorderedListButton({
       );
     }
 
+    updateHistory(newText);
     setMarkdownText(newText);
     textarea.focus();
   };

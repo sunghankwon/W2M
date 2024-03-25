@@ -5,6 +5,7 @@ export function NumberListButton({
   markdownText,
   setMarkdownText,
   setCursorPosition,
+  updateHistory,
 }) {
   const applyNumbering = () => {
     const textarea = editorRef.current;
@@ -14,6 +15,8 @@ export function NumberListButton({
 
     let newText;
     let numberText = "";
+
+    updateHistory(markdownText);
 
     if (selectedText) {
       const textArray = selectedText.split("\n");
@@ -66,6 +69,7 @@ export function NumberListButton({
       );
     }
 
+    updateHistory(newText);
     setMarkdownText(newText);
     textarea.focus();
   };

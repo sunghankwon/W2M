@@ -1,6 +1,11 @@
 import lowercaseIcon from "../../assets/lowercase.png";
 
-export function LowerCaseButton({ editorRef, markdownText, setMarkdownText }) {
+export function LowerCaseButton({
+  editorRef,
+  markdownText,
+  setMarkdownText,
+  updateHistory,
+}) {
   const applyLowercase = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;
@@ -11,12 +16,15 @@ export function LowerCaseButton({ editorRef, markdownText, setMarkdownText }) {
       return;
     }
 
+    updateHistory(markdownText);
+
     const lowercaseText = selectedText.toLowerCase();
     const newText =
       markdownText.substring(0, startPos) +
       lowercaseText +
       markdownText.substring(endPos);
 
+    updateHistory(newText);
     setMarkdownText(newText);
 
     const newCursorPos = startPos + lowercaseText.length;
