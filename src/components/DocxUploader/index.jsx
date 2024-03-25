@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import JSZip from "jszip";
 
+import ConversionGuide from "../ConversionGuide";
 import useFileNameStore from "../../store/useFileName";
 import useDocxXmlStore from "../../store/useDocxXml";
 import docxImage from "../../assets/docx.png";
@@ -112,7 +113,7 @@ function DocxUploader() {
             accept=".docx"
           />
           <div
-            className="relative flex flex-col items-center justify-center w-full px-4 py-3 space-y-2 text-lg font-bold text-white bg-gray-500 rounded-lg sm:text-xl md:text-2xl"
+            className="relative flex flex-col items-center justify-center w-full px-4 py-3 space-y-2 text-lg font-bold text-white bg-gray-400 rounded-lg sm:text-xl md:text-2xl"
             style={{ minHeight: "200px" }}
           >
             {fileInfo.name ? (
@@ -172,6 +173,7 @@ function DocxUploader() {
           Convert
         </button>
       </div>
+      <ConversionGuide />
     </>
   );
 }
