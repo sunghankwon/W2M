@@ -63,9 +63,13 @@
 .editor-container {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
   width: 100%;
-  max-width: 100%;
+}
+
+.editor-textarea,
+.editor-toolbar {
+  width: 100%;
+  resize: none;
 }
 
 @layer utilities {

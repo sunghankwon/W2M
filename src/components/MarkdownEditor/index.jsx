@@ -117,7 +117,7 @@ function MarkdownEditor({ handleEditorScroll, editorRef, previewRef }) {
         ref={editorRef}
         rows="23"
         cols="80"
-        className="p-2 mr-10 border border-gray-300 rounded-lg focus:border-gray-300 focus:outline-none"
+        className="p-2 mr-10 border border-gray-300 rounded-lg focus:border-gray-300 focus:outline-none editor-textarea"
       />
     </>
   );
