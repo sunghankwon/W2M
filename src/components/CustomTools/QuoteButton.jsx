@@ -13,20 +13,25 @@ export function QuoteButton({
     const selectedText = markdownText.substring(startPos, endPos);
 
     let newText;
-    let numberText = "";
+    let quoteText = "";
 
     if (selectedText) {
       const textArray = selectedText.split("\n");
       for (let text of textArray) {
-        numberText += `> ${text}\n`;
+        quoteText += `> ${text}\n`;
       }
 
       newText =
         markdownText.substring(0, startPos) +
-        numberText +
+        quoteText +
         markdownText.substring(endPos);
+
+      setTimeout(() => {
+        setCursorPosition(startPos + quoteText.length);
+      }, 0);
     } else {
       newText = `${markdownText.substring(0, startPos)}> ${markdownText.substring(startPos)}`;
+
       setTimeout(() => setCursorPosition(startPos + 2), 0);
     }
 
@@ -39,7 +44,7 @@ export function QuoteButton({
       onClick={applyQuote}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >
-      <img src={quoteIcon} className="h-5"></img>
+      <img src={quoteIcon} alt="Quote" className="h-5" />
     </button>
   );
 }

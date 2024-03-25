@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import strikethroughIcon from "../../assets/strikethrough.png";
 
 export function StrikethroughButton({
@@ -12,7 +13,11 @@ export function StrikethroughButton({
     let endPos = textarea.selectionEnd;
     const textBefore = markdownText.substring(0, startPos);
     const textAfter = markdownText.substring(endPos);
-    const selectedText = markdownText.substring(startPos, endPos);
+    let selectedText = markdownText.substring(startPos, endPos);
+
+    const leadingSpaces = selectedText.match(/^(\s*)/)[0];
+    const trailingSpaces = selectedText.match(/(\s*)$/)[0];
+    selectedText = selectedText.trim();
 
     let newText;
 
@@ -21,11 +26,22 @@ export function StrikethroughButton({
 
     if (hasStrikethroughBefore && hasStrikethroughAfter && selectedText) {
       newText =
-        markdownText.substring(0, startPos - 2) +
+        textBefore.slice(0, -2) +
+        leadingSpaces +
         selectedText +
-        markdownText.substring(endPos + 2);
+        trailingSpaces +
+        textAfter.slice(2);
       startPos -= 2;
-      endPos -= 2;
+      endPos += 2;
+      const newCursorPos =
+        startPos +
+        leadingSpaces.length +
+        selectedText.length +
+        trailingSpaces.length -
+        2;
+      setTimeout(() => {
+        setCursorPosition(newCursorPos);
+      }, 0);
     } else if (
       !hasStrikethroughBefore &&
       !hasStrikethroughAfter &&
@@ -39,13 +55,29 @@ export function StrikethroughButton({
         const trimmedText = selectedText.substring(2, selectedText.length - 2);
         newText =
           markdownText.substring(0, startPos) +
+          leadingSpaces +
           trimmedText +
+          trailingSpaces +
           markdownText.substring(endPos);
+        setTimeout(() => setCursorPosition(startPos + trimmedText.length), 0);
       } else {
         newText =
           markdownText.substring(0, startPos) +
+          leadingSpaces +
           `~~${selectedText}~~` +
+          trailingSpaces +
           markdownText.substring(endPos);
+        setTimeout(
+          () =>
+            setCursorPosition(
+              startPos +
+                leadingSpaces.length +
+                selectedText.length +
+                4 +
+                trailingSpaces.length,
+            ),
+          0,
+        );
       }
     } else {
       newText = `${markdownText.substring(0, startPos)}~~~~${markdownText.substring(startPos)}`;
@@ -56,6 +88,21 @@ export function StrikethroughButton({
     textarea.setSelectionRange(startPos, endPos);
     textarea.focus();
   };
+
+  const handleShortcuts = (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "d") {
+      event.preventDefault();
+      applyStrikethrough();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleShortcuts);
+
+    return () => {
+      document.removeEventListener("keydown", handleShortcuts);
+    };
+  }, [applyStrikethrough]);
 
   return (
     <button

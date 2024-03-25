@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import italicIcon from "../../assets/italic.png";
 
 export function ItalicButton({
@@ -12,7 +13,11 @@ export function ItalicButton({
     let endPos = textarea.selectionEnd;
     const textBefore = markdownText.substring(0, startPos);
     const textAfter = markdownText.substring(endPos);
-    const selectedText = markdownText.substring(startPos, endPos);
+    let selectedText = markdownText.substring(startPos, endPos);
+
+    const leadingSpaces = selectedText.match(/^(\s*)/)[0];
+    const trailingSpaces = selectedText.match(/(\s*)$/)[0];
+    selectedText = selectedText.trim();
 
     let newText;
     const hasItalicBefore = textBefore.endsWith("_");
@@ -20,11 +25,20 @@ export function ItalicButton({
 
     if (hasItalicBefore && hasItalicAfter && selectedText) {
       newText =
-        markdownText.substring(0, startPos - 1) +
+        textBefore.slice(0, -1) +
+        leadingSpaces +
         selectedText +
-        markdownText.substring(endPos + 1);
-      startPos -= 1;
-      endPos -= 1;
+        trailingSpaces +
+        textAfter.slice(1);
+      const newCursorPos =
+        startPos +
+        leadingSpaces.length +
+        selectedText.length +
+        trailingSpaces.length -
+        1;
+      setTimeout(() => {
+        setCursorPosition(newCursorPos);
+      }, 0);
     } else if (!hasItalicBefore && !hasItalicAfter && selectedText) {
       if (
         selectedText.startsWith("_") &&
@@ -34,13 +48,29 @@ export function ItalicButton({
         const trimmedText = selectedText.substring(1, selectedText.length - 1);
         newText =
           markdownText.substring(0, startPos) +
+          leadingSpaces +
           trimmedText +
+          trailingSpaces +
           markdownText.substring(endPos);
+        setTimeout(() => setCursorPosition(startPos + trimmedText.length), 0);
       } else {
         newText =
-          markdownText.substring(0, startPos) +
+          textBefore +
+          leadingSpaces +
           `_${selectedText}_` +
-          markdownText.substring(endPos);
+          trailingSpaces +
+          textAfter;
+        setTimeout(
+          () =>
+            setCursorPosition(
+              startPos +
+                leadingSpaces.length +
+                selectedText.length +
+                2 +
+                trailingSpaces.length,
+            ),
+          0,
+        );
       }
     } else {
       newText = `${markdownText.substring(0, startPos)}__${markdownText.substring(startPos)}`;
@@ -52,12 +82,26 @@ export function ItalicButton({
     textarea.focus();
   };
 
+  const handleShortcuts = (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "i") {
+      event.preventDefault();
+      applyItalic();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleShortcuts);
+    return () => {
+      document.removeEventListener("keydown", handleShortcuts);
+    };
+  }, [markdownText]);
+
   return (
     <button
       onClick={applyItalic}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >
-      <img src={italicIcon} className="h-5"></img>
+      <img src={italicIcon} alt="Italic" className="h-5" />
     </button>
   );
 }

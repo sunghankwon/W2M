@@ -10,21 +10,51 @@ export function HeaderButton({
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;
     const textBeforeSelection = markdownText.substring(0, startPos);
-
     const indexOfLastNewLine = textBeforeSelection.lastIndexOf("\n");
     const startOfLine = indexOfLastNewLine === -1 ? 0 : indexOfLastNewLine + 1;
 
-    const newText =
-      markdownText.substring(0, startOfLine) +
-      `### ` +
-      markdownText.substring(startOfLine);
+    const currentLineText = markdownText.substring(
+      startOfLine,
+      markdownText.indexOf("\n", startPos) === -1
+        ? undefined
+        : markdownText.indexOf("\n", startPos),
+    );
+
+    const headerMatch = currentLineText.match(/^(#{1,6})\s/);
+    let newText;
+
+    if (headerMatch) {
+      const currentHeaderLevel = headerMatch[1].length;
+      const headerPrefix = "#".repeat((currentHeaderLevel % 6) + 1);
+
+      newText =
+        markdownText.substring(0, startOfLine) +
+        headerPrefix +
+        " " +
+        currentLineText.substring(currentHeaderLevel + 1) +
+        markdownText.substring(
+          markdownText.indexOf("\n", startPos) === -1
+            ? markdownText.length
+            : markdownText.indexOf("\n", startPos),
+        );
+    } else {
+      newText =
+        markdownText.substring(0, startOfLine) +
+        "### " +
+        markdownText.substring(startOfLine);
+    }
 
     setMarkdownText(newText);
     textarea.focus();
 
-    const newCursorPos = startOfLine + 4;
-    textarea.setSelectionRange(newCursorPos, newCursorPos);
-    setCursorPosition(newCursorPos);
+    setTimeout(() => {
+      const newCursorPos =
+        newText.indexOf("\n", startOfLine) === -1
+          ? newText.length
+          : newText.indexOf("\n", startOfLine);
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+      setCursorPosition(newCursorPos);
+    }, 0);
   };
 
   return (
@@ -32,7 +62,7 @@ export function HeaderButton({
       onClick={applyHeader}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >
-      <img src={headerIcon} className="h-5"></img>
+      <img src={headerIcon} alt="Header" className="h-5" />
     </button>
   );
 }

@@ -7,10 +7,15 @@ export function CapitalizeButton({ editorRef, markdownText, setMarkdownText }) {
     const endPos = textarea.selectionEnd;
     const selectedText = markdownText.substring(startPos, endPos);
 
+    if (!selectedText) {
+      return;
+    }
+
+    let capitalizedText;
     let newText;
 
     if (selectedText) {
-      const capitalizedText = selectedText
+      capitalizedText = selectedText
         .split(" ")
         .map(
           (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
@@ -21,11 +26,13 @@ export function CapitalizeButton({ editorRef, markdownText, setMarkdownText }) {
         markdownText.substring(0, startPos) +
         capitalizedText +
         markdownText.substring(endPos);
-    } else {
-      return;
     }
 
     setMarkdownText(newText);
+
+    const newCursorPos = startPos + capitalizedText.length;
+    textarea.focus();
+    textarea.setSelectionRange(newCursorPos, newCursorPos);
   };
 
   return (

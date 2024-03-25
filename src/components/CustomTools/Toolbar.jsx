@@ -46,7 +46,6 @@ export function Toolbar({ editorRef, markdownText, setMarkdownText }) {
         editorRef={editorRef}
         markdownText={markdownText}
         setMarkdownText={setMarkdownText}
-        setCursorPosition={setCursorPosition}
       />
       <StrikethroughButton
         editorRef={editorRef}
@@ -69,7 +68,6 @@ export function Toolbar({ editorRef, markdownText, setMarkdownText }) {
         editorRef={editorRef}
         markdownText={markdownText}
         setMarkdownText={setMarkdownText}
-        setCursorPosition={setCursorPosition}
       />
       <LinkButton
         editorRef={editorRef}
