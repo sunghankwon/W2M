@@ -17,7 +17,7 @@ import downloadIcon from "../../assets/download.png";
 
 function MarkdownConvert() {
   const [originName, setOriginName] = useState("");
-  const [buttonText, setButtonText] = useState("Copy code");
+  const [buttonText, setButtonText] = useState("Copy Markdown");
   const [iconSrc, setIconSrc] = useState(copyIcon);
   const { fileName } = useFileNameStore();
   const { docxXmlData, docxFilesData } = useDocxXmlStore();
