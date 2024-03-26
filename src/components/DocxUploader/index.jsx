@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import JSZip from "jszip";
 
@@ -15,6 +15,11 @@ function DocxUploader() {
   const { setDocxXmlData, setDocxFilesData } = useDocxXmlStore();
   const { setFileName } = useFileNameStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setDocxFilesData("");
+    setDocxFilesData("");
+  }, []);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
