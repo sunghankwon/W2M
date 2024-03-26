@@ -3,11 +3,13 @@ import { marked } from "marked";
 
 import useMarkdownTextStore from "../../store/useMarkdownText";
 import useDocxXmlStore from "../../store/useDocxXml";
+import useFullScreenStore from "../../store/useFullScreen";
 
 const Preview = forwardRef(({ handlePreviewScroll }, ref) => {
   const { markdownText } = useMarkdownTextStore();
   const [processedMarkdown, setProcessedMarkdown] = useState(markdownText);
   const { docxFilesData } = useDocxXmlStore();
+  const { isFullScreen } = useFullScreenStore();
 
   useEffect(() => {
     const renderer = new marked.Renderer();
@@ -72,7 +74,7 @@ const Preview = forwardRef(({ handlePreviewScroll }, ref) => {
     <div
       ref={ref}
       onScroll={handlePreviewScroll}
-      className="w-[706px] h-[650px] border rounded-md overflow-y-auto scrollbar-hide pl-2 markdown-preview prose lg:prose-xs"
+      className={`w-full max-w-[800px] min-w-[706px] h-auto border rounded-md overflow-y-auto scrollbar-hide pl-2 prose lg:prose-xs markdown-preview ${!isFullScreen ? "max-h-[650px]" : ""}`}
       dangerouslySetInnerHTML={getMarkdownText()}
     />
   );

@@ -139,7 +139,7 @@ function MarkdownConvert() {
         setIconSrc(checkIcon);
 
         setTimeout(() => {
-          setButtonText("Copy code");
+          setButtonText("Copy Markdown");
           setIconSrc(copyIcon);
         }, 2000);
       })
@@ -201,7 +201,7 @@ function MarkdownConvert() {
             previewRef={previewRef}
           />
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col preview-container">
           <h2 className="text-xl">Preview</h2>
           <Preview ref={previewRef} handlePreviewScroll={handlePreviewScroll} />
         </div>

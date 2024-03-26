@@ -1,6 +1,13 @@
+import useFullScreenStore from "../../store/useFullScreen";
 import w2mLogo from "../../assets/w2mLogo.png";
 
 function Header() {
+  const { isFullScreen } = useFullScreenStore();
+
+  if (isFullScreen) {
+    return null;
+  }
+
   return (
     <div className="flex items-center justify-center mt-8 mb-8">
       <img

@@ -66,8 +66,26 @@
   width: 100%;
 }
 
+.preview-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.markdown-preview {
+  max-width: 100%;
+  width: 100%;
+  resize: none;
+}
+
+.editor-container,
+.preview-container {
+  transition: all 0.3s ease;
+}
+
 .editor-textarea,
 .editor-toolbar {
+  max-width: 100%;
   width: 100%;
   resize: none;
 }

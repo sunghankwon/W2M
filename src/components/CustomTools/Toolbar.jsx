@@ -15,6 +15,7 @@ import { TaskButton } from "./TaskButton";
 import { ImageButton } from "./ImageButton";
 import { TableButton } from "./TableButton";
 import { DividerButton } from "./DividerButton";
+import { FullScreenButton } from "./FullScreenButton";
 
 export function Toolbar({ editorRef, updateHistory }) {
   const setCursorPosition = (pos) => {
@@ -73,6 +74,7 @@ export function Toolbar({ editorRef, updateHistory }) {
       />
       <ImageButton editorRef={editorRef} updateHistory={updateHistory} />
       <TableButton editorRef={editorRef} updateHistory={updateHistory} />
+      <FullScreenButton />
     </div>
   );
 }
