@@ -3,7 +3,12 @@ import { useEffect, useRef } from "react";
 import { Toolbar } from "../CustomTools/Toolbar";
 import useMarkdownTextStore from "../../store/useMarkdownText";
 
-function MarkdownEditor({ handleEditorScroll, editorRef, previewRef }) {
+function MarkdownEditor({
+  handleEditorScroll,
+  editorRef,
+  previewRef,
+  isProgrammaticScroll,
+}) {
   const { markdownText, setMarkdownText } = useMarkdownTextStore();
   const historyRef = useRef([markdownText]);
   const historyIndexRef = useRef(0);
@@ -60,29 +65,34 @@ function MarkdownEditor({ handleEditorScroll, editorRef, previewRef }) {
   };
 
   const handleChange = (event) => {
+    isProgrammaticScroll.current = true;
     const newValue = event.target.value;
     const currentScrollTop = editorRef.current.scrollTop;
 
     setMarkdownText(newValue);
 
     setTimeout(() => {
+      isProgrammaticScroll.current = false;
       if (!editorRef.current || !previewRef.current) return;
 
       editorRef.current.scrollTop = currentScrollTop;
 
       const { scrollTop, scrollHeight, clientHeight } = editorRef.current;
       const isWithinBottom10Percent =
-        scrollTop + clientHeight >= scrollHeight * 0.8;
+        scrollTop + clientHeight >= scrollHeight * 0.9;
 
       if (isWithinBottom10Percent) {
+        if (newValue.endsWith("\n")) {
+          editorRef.current.scrollTop = editorRef.current.scrollTop + 20;
+        }
         const previewScrollHeight =
           previewRef.current.scrollHeight -
           previewRef.current.clientHeight +
-          10;
+          20;
         const scrollRatio = scrollTop / (scrollHeight - clientHeight);
         previewRef.current.scrollTop = previewScrollHeight * scrollRatio;
       }
-    }, 0);
+    }, 10);
 
     if (newValue.endsWith(" ") || newValue.endsWith("\n")) {
       const newHistoryIndex = historyIndexRef.current + 1;

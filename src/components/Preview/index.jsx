@@ -74,7 +74,7 @@ const Preview = forwardRef(({ handlePreviewScroll }, ref) => {
     <div
       ref={ref}
       onScroll={handlePreviewScroll}
-      className={`w-full max-w-[800px] min-w-[706px] h-auto border rounded-md overflow-y-auto scrollbar-hide pl-2 prose lg:prose-xs markdown-preview ${!isFullScreen ? "max-h-[650px]" : ""}`}
+      className={`w-full max-w-[800px] min-w-[706px] h-auto min-h-[650px] border rounded-md overflow-y-auto scrollbar-hide pl-2 prose lg:prose-xs markdown-preview ${!isFullScreen ? "max-h-[650px]" : ""}`}
       dangerouslySetInnerHTML={getMarkdownText()}
     />
   );

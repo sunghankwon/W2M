@@ -199,6 +199,7 @@ function MarkdownConvert() {
             handleEditorScroll={handleEditorScroll}
             editorRef={editorRef}
             previewRef={previewRef}
+            isProgrammaticScroll={isProgrammaticScroll}
           />
         </div>
         <div className="flex flex-col preview-container">
