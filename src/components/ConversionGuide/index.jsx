@@ -20,15 +20,18 @@ function ConversionGuide() {
               Markdown 포맷으로 변환한 Docx 문서를 선택합니다.
             </li>
             <li className="pb-4 text-xl border-t pt-7 md:text-2xl">
-              W2M이 자동으로 Docx 문서를 Markdown 파일로 변환합니다.
+              W2M이 자동으로 Docx 문서를 MD 파일로 변환합니다.
             </li>
             <li className="pb-4 text-xl border-t pt-7 md:text-2xl">
-              변환된 Markdown 파일을 다운로드 하거나 Markdown 에디터를 통해
-              수정합니다.
+              이미지가 포함된 경우 ZIP 파일로, 포함되지 않은 경우 MD 파일로
+              다운로드됩니다.
+            </li>
+            <li className="pb-4 text-xl border-t pt-7 md:text-2xl">
+              변환된 마크다운 파일은 Markdown 에디터를 통해 수정할 수 있습니다.
             </li>
           </ol>
         </div>
-        <div className="flex-none mt-10 w-[35%]">
+        <div className="flex-none mt-20 w-[35%]">
           <img
             src={docxToMdIcon}
             alt="Convert DOCX to Markdown"
