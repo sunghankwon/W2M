@@ -11,7 +11,7 @@ module.exports = {
     sourceType: "module",
   },
   settings: { react: { version: "18.2" } },
-  plugins: ["react", "prettier", "react-hooks"],
+  plugins: ["react", "react-refresh", "prettier", "react-hooks"],
   rules: {
     "react-refresh/only-export-components": [
       "warn",
