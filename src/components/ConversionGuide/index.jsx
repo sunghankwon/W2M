@@ -1,8 +1,9 @@
+import React from "react";
 import docxToMdIcon from "../../assets/d2m.png";
 
 function ConversionGuide() {
   return (
-    <div className="w-full pt-20 pb-20 mx-auto mt-40 mb-40 border-t border-b max-w-7xl">
+    <div className="w-full pt-20 pb-20 mx-auto mt-40 mb-10 border-t border-b max-w-7xl">
       <h2 className="mb-5 text-3xl font-semibold md:text-4xl">
         온라인에서 Word문서를 Markdown 파일로 변환하는 방법
       </h2>
