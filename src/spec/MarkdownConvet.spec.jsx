@@ -1,5 +1,5 @@
 import React from "react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, beforeAll } from "vitest";
 import { act } from "react-dom/test-utils";
 import { MemoryRouter } from "react-router-dom";
 import { render, screen, waitFor } from "@testing-library/react";
@@ -36,6 +36,10 @@ const mockDocxFilesData = {
 };
 
 describe("MarkdownConvert component tests", () => {
+  beforeAll(() => {
+    global.URL.createObjectURL = vi.fn();
+  });
+
   beforeEach(() => {
     render(
       <MemoryRouter>
