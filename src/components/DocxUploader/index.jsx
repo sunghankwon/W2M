@@ -156,22 +156,24 @@ function DocxUploader() {
             <img
               src={docxImage}
               alt="DOCX file"
-              className="w-48 h-48 sm:w-52 sm:h-52"
+              className="w-24 h-24 xs:w-32 xs:h-32 sm:w-48 sm:h-48 md:w-52 md:h-52"
             />
-            <span className="text-xl sm:text-2xl">DOCX</span>
+            <span className="text-lg xs:text-xl sm:text-2xl">DOCX</span>
           </div>
-          <span className="text-6xl sm:text-7xl md:text-8xl">→</span>
+          <span className="text-4xl xs:text-6xl sm:text-7xl md:text-8xl">
+            →
+          </span>
           <div className="flex flex-col items-center">
             <img
               src={markdownImage}
               alt="Markdown file"
-              className="w-48 h-48 sm:w-52 sm:h-52"
+              className="w-24 h-24 xs:w-32 xs:h-32 sm:w-48 sm:h-48 md:w-52 md:h-52"
             />
-            <span className="text-xl sm:text-2xl">MD</span>
+            <span className="text-lg xs:text-xl sm:text-2xl">MD</span>
           </div>
         </div>
         <button
-          className={`w-full text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mt-10 py-3 px-6 rounded text-white ${fileInfo.file ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-500 cursor-not-allowed"}`}
+          className={`w-full text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold py-2 sm:py-3 md:py-4 rounded text-white ${fileInfo.file ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-500 cursor-not-allowed"}`}
           onClick={handleConvert}
           disabled={!fileInfo.file}
         >

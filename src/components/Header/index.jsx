@@ -20,10 +20,10 @@ function Header() {
         <img
           src={w2mLogo}
           alt="W2M Logo"
-          className="w-20 h-20 mr-6 sm:w-20 sm:h-20"
+          className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28"
         />
       </button>
-      <h1 className="text-4xl font-bold sm:text-4xl md:text-4xl lg:text-6xl">
+      <h1 className="text-3xl font-bold sm:text-4xl md:text-5xl lg:text-6xl">
         W2M
       </h1>
     </div>
