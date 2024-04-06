@@ -6,7 +6,7 @@ import { act } from "react-dom/test-utils";
 import Header from "../components/Header";
 import useFullScreenStore from "../store/useFullScreen";
 
-describe("Header Component", () => {
+describe("Header Component tests", () => {
   beforeEach(() => {
     render(
       <MemoryRouter>

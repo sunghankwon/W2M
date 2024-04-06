@@ -1,10 +1,10 @@
 import React from "react";
-import { describe, it, expect, beforeEach, beforeAll } from "vitest";
+import { describe, it, expect, beforeEach, beforeAll, vi } from "vitest";
 import { act } from "react-dom/test-utils";
 import { MemoryRouter } from "react-router-dom";
 import { render, screen, waitFor } from "@testing-library/react";
-import MarkdownConvert from "../components/MarkdownConvert";
 
+import MarkdownConvert from "../components/MarkdownConvert";
 import useDocxXmlStore from "../store/useDocxXml";
 import useMarkdownTextStore from "../store/useMarkdownText";
 
@@ -35,7 +35,7 @@ const mockDocxFilesData = {
   "word/numbering.xml": "",
 };
 
-describe("MarkdownConvert component tests", () => {
+describe("MarkdownConvert Component tests", () => {
   beforeAll(() => {
     global.URL.createObjectURL = vi.fn();
   });
