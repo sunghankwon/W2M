@@ -30,6 +30,21 @@
 
 # 🔎 preview
 
+<details>
+<summary>워드 문서 업로드</summary>
+![button](./public/button_active.gif)
+</details>
+
+<details>
+<summary>워드 문서 마크다운으로 변환</summary>
+![convert](./public/markdown_convert.gif)
+</details>
+
+<details>
+<summary>마크다운 에디터</summary>
+![editor](./public/markdown_editor.gif)
+</details>
+
 # **🛠 Tech Stacks**
 
 ### **Client**
