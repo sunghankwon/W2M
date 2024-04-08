@@ -30,19 +30,21 @@
 
 # 🔎 preview
 
+# 🔎 preview
+
 <details>
 <summary>워드 문서 업로드</summary>
-![button](./public/button_active.gif)
+<img src="./public/button_active.gif" alt="button" />
 </details>
 
 <details>
 <summary>워드 문서 마크다운으로 변환</summary>
-![convert](./public/markdown_convert.gif)
+<img src="./public/markdown_convert.gif" alt="convert" />
 </details>
 
 <details>
 <summary>마크다운 에디터</summary>
-![editor](./public/markdown_editor.gif)
+<img src="./public/markdown_editor.gif" alt="editor" />
 </details>
 
 # **🛠 Tech Stacks**
