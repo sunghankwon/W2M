@@ -17,8 +17,9 @@ const Preview = forwardRef(({ handlePreviewScroll }, ref) => {
     renderer.image = function (href, title, text) {
       const isHttpUrl =
         href.startsWith("http://") || href.startsWith("https://");
+      const isBase64Url = href.startsWith("data:image/");
 
-      if (isHttpUrl) {
+      if (isHttpUrl || isBase64Url) {
         return `<img src="${href}" alt="${text}" title="${title}" class="max-w-[96%] h-auto block mx-auto">`;
       } else {
         return `
@@ -79,5 +80,7 @@ const Preview = forwardRef(({ handlePreviewScroll }, ref) => {
     />
   );
 });
+
+Preview.displayName = "Preview";
 
 export default Preview;
