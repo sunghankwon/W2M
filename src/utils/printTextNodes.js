@@ -25,7 +25,12 @@ async function printTextNodes(
   let newNumberingLevel = numberingLevel;
 
   if (node.nodeType === 3 && node.textContent.trim()) {
-    const content = `${headingLevel}${numberingLevel}${markdownSyntax}${node.textContent.trim()}${markdownSyntax.split("").reverse().join("").replace(">u<", "</u>")}`;
+    const syntaxReverse = markdownSyntax
+      .split("")
+      .reverse()
+      .join("")
+      .replace(">u<", "</u>");
+    const content = `${headingLevel}${numberingLevel}${markdownSyntax}${node.textContent.trim()}${syntaxReverse}`;
     markdown += isListItem || depth === 0 ? `${content}` : `${content} `;
   } else if (node.nodeType === 1) {
     if (node.nodeName === "w:p") {
