@@ -97,6 +97,7 @@ export function UnderlineButton({ editorRef, updateHistory }) {
 
   return (
     <button
+      data-testid="underlineButton"
       onClick={applyUnderLine}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >

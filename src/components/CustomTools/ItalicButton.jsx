@@ -100,6 +100,7 @@ export function ItalicButton({ editorRef, setCursorPosition, updateHistory }) {
 
   return (
     <button
+      data-testid="italicButton"
       onClick={applyItalic}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >

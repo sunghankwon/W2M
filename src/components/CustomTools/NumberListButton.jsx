@@ -77,6 +77,7 @@ export function NumberListButton({
 
   return (
     <button
+      data-testid="numberListButton"
       onClick={applyNumbering}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >

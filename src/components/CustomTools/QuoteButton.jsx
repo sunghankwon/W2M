@@ -42,6 +42,7 @@ export function QuoteButton({ editorRef, setCursorPosition, updateHistory }) {
 
   return (
     <button
+      data-testid="quoteButton"
       onClick={applyQuote}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >

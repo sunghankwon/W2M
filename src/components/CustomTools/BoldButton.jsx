@@ -104,6 +104,7 @@ export function BoldButton({ editorRef, setCursorPosition, updateHistory }) {
 
   return (
     <button
+      data-testid="boldButton"
       onClick={applyBold}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >

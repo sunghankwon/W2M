@@ -24,7 +24,10 @@ export function Toolbar({ editorRef, updateHistory }) {
   };
 
   return (
-    <div className="flex w-[706px] h-9 bg-gray-100 border editor-toolbar">
+    <div
+      className="flex w-[706px] h-9 bg-gray-100 border editor-toolbar"
+      role="toolbar"
+    >
       <HeaderButton
         editorRef={editorRef}
         setCursorPosition={setCursorPosition}
