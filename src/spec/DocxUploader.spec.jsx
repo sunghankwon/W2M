@@ -6,7 +6,7 @@ import { MemoryRouter } from "react-router-dom";
 
 import DocxUploader from "../components/DocxUploader";
 
-describe("DocxUploader component tests", () => {
+describe("DocxUploader Component tests", () => {
   it("should disable the convert button if no file is selected", async () => {
     render(
       <MemoryRouter>
