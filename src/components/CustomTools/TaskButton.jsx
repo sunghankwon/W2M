@@ -71,6 +71,7 @@ export function TaskButton({ editorRef, setCursorPosition, updateHistory }) {
 
   return (
     <button
+      data-testid="taskButton"
       onClick={applyTaskList}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >

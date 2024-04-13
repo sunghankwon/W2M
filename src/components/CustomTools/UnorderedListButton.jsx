@@ -72,6 +72,7 @@ export function UnorderedListButton({
 
   return (
     <button
+      data-testid="unorderedListButton"
       onClick={applyUnorderedList}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >

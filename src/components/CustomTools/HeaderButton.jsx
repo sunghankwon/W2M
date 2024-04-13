@@ -61,6 +61,7 @@ export function HeaderButton({ editorRef, setCursorPosition, updateHistory }) {
 
   return (
     <button
+      data-testid="headerButton"
       onClick={applyHeader}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >

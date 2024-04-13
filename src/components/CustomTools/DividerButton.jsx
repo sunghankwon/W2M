@@ -25,6 +25,7 @@ export function DividerButton({ editorRef, updateHistory }) {
 
   return (
     <button
+      data-testid="dividerButton"
       onClick={applyDivider}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >
