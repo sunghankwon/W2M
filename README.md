@@ -170,24 +170,28 @@ DOCX 파일은 다양한 XML들로 이루어져 있으며, 이를 마크다운�
 압축을 해제한 각 XML 태그를 마크다운 문법에 맞게 변환하는 로직을 구현하기 위해서 가장 먼저 진행해야할 부분은 DOCX 문서에서 생성된 XML 태그들이 각각 어떤 속성을 가지고 있는지 자세히 알아야 할 필요가 있었습니다.
 이에 저는 실제 문서 내용을 담고 있으며, 텍스트와 문서의 구조를 정의하는 document.xml을 기준으로 태그를 분석하였습니다.
 
+<br />
+
 ### 1-2. XML 태그 분석
 
 document.xml에서 문서의 구조를 나타내는 주요태그들을 살펴보겠습니다.
 
-- <w:body>: 문서의 본문을 나타내는 요소입니다. 실제 문서의 내용이 이 안에 위치합니다.
-- <w:p>: (Paragraph) 문단을 나타내는 태그입니다. 텍스트의 블록을 구분합니다.
-- <w:t>: (Text) 텍스트 런 안의 실제 텍스트 내용을 포함합니다.
-- <w:r>: (Run) 문단 내의 텍스트 런을 나타냅니다. 스타일이나 속성이 달라지는 텍스트의 단위입니다.
-- <w:pStyle>: 문단 스타일을 정의합니다. w:val 속성을 통해 스타일의 이름(예: Heading1, Title 등)을 지정합니다.
-- <w:rPr>: 실행 속성(Run Properties)을 정의합니다. 글꼴, 크기, 색상 등 텍스트 스타일 관련 속성을 포함합니다.
-- <w:hyperlink>: 하이퍼링크 속성을 가지고있음을 정의합니다. document.xml에서는 해당 요소가 하이퍼링크 속성을 가진다는것만 확인 가능 하고, .rels파일과 파싱하여 해당 id와 동일한 아이디를 같는 요소의 target값에 링크 주소를 확인 할 수 있습니다.
-- <w:numpr> : 리스트(넘버링)를 시작합니다. 리스트를 감싸주는 요소로 해당 태그내에 리스트 요소가 있습니다.
-- <w:numId> : 리스트(넘버링)의 id를 나타내고 해당 요소의 값에 따라 값이 같으면 하나의 리스트로 묶인다.
-- <w:tbl>:테이블을 시작합니다. 테이블이 존재할경우 테이블을 감싸주는 요소로 해당 태그내에 테이블 요소가 있습니다.
-- <w:tblPr>: 테이블의 속성들을 정의합니다.
-- <w:drawing>: 문서 내에 그림(이미지)을 포함하는 데 사용되는 태그입니다.
+- `<w:body>` : 문서의 본문을 나타내는 요소입니다. 실제 문서의 내용이 이 안에 위치합니다.
+- `<w:p>` : (Paragraph) 문단을 나타내는 태그입니다. 텍스트의 블록을 구분합니다.
+- `<w:t>` : (Text) 텍스트 런 안의 실제 텍스트 내용을 포함합니다.
+- `<w:r>` : (Run) 문단 내의 텍스트 런을 나타냅니다. 스타일이나 속성이 달라지는 텍스트의 단위입니다.
+- `<w:pStyle>` : 문단 스타일을 정의합니다. w:val 속성을 통해 스타일의 이름(예: Heading1, Title 등)을 지정합니다.
+- `<w:rPr>` : 실행 속성(Run Properties)을 정의합니다. 글꼴, 크기, 색상 등 텍스트 스타일 관련 속성을 포함합니다.
+- `<w:hyperlink>` : 하이퍼링크 속성을 가지고있음을 정의합니다. document.xml에서는 해당 요소가 하이퍼링크 속성을 가진다는것만 확인 가능 하고, .rels파일과 파싱하여 해당 id와 동일한 아이디를 같는 요소의 target값에 링크 주소를 확인 할 수 있습니다.
+- `<w:numpr>` : 리스트(넘버링)를 시작합니다. 리스트를 감싸주는 요소로 해당 태그내에 리스트 요소가 있습니다.
+- `<w:numId>` : 리스트(넘버링)의 id를 나타내고 해당 요소의 값에 따라 값이 같으면 하나의 리스트로 묶인다.
+- `<w:tbl>` :테이블을 시작합니다. 테이블이 존재할경우 테이블을 감싸주는 요소로 해당 태그내에 테이블 요소가 있습니다.
+- `<w:tblPr>` : 테이블의 속성들을 정의합니다.
+- `<w:drawing>` : 문서 내에 그림(이미지)을 포함하는 데 사용되는 태그입니다.
 
 위의 태그들을 중심으로 각각 내부 태그들의 속성들을 확인하여 마크다운으로 변경하는 로직을 구성하였습니다.
+
+<br />
 
 ### 1-3. XML 마크다운 변환
 
@@ -230,12 +234,18 @@ if (node.nodeType === 3 && node.textContent.trim()) {
 // 생략
 ```
 
+<br />
+
 ## 2. document.xml 문서만으로 변환이 어려운 부분은 어떻게 변경을 해야했나?
 
 ### 2-1. 하이퍼링크 처리
 
 document.xml 문서에는 해당 요소가 하이퍼링크 속성을 가지고 있다는 <w:hyperlink> 태그에 id값만 표기가 되고 연결된 url주소에 대한 정보를 확인할 수 없습니다.
 하이퍼링크의 url 경로를 알기 위해서는 document.xml.rels 파일 내에서, <Relationship>를 순회하면서 각 id와 대응하는 타겟 URL을 연결하는 관계 맵을 구성합니다. 구성된 관계 맵에서 기존의 document.xml의 <w:hyperlink>의 태그 id를 이용하여 하이퍼링크의 URL 정보를 추출하고 마크다운 형식으로 변환하였습니다.
+
+<p align="left">
+  <img width="300" alt="워드 하이퍼링크" src="./public/hyperlink.png">
+</p>
 
 ```js
 const relationships = xmlDoc.getElementsByTagName("Relationship");
@@ -248,42 +258,23 @@ for (let relationship of relationships) {
 }
 ```
 
+<br />
+
 ### 2-2. 리스트 처리
 
-하이퍼링크와 마찬가지로, document.xml 문서 내에서는 <w:numId> 태그를 통해 ID값만 표시됩니다. 해당 요소가 점 리스트인지 숫자 리스트인지를 판별하기 위해서는 numbering.xml 파일을 확인해야 합니다. 여기서 해당 ID가 numbering.xml 내에서 어떠한 ID를 가지는지 확인하고, <w:numFmt>를 통해 리스트의 형태를 파악할 수 있습니다. 리스트를 마크다운으로 변환하기 위해서는 먼저 numbering.xml에서 <w:abstractNumId> 태그별로 각 리스트의 형태를 매핑합니다. 이후 매핑된 객체를 <w:numId>와 연결하여 해당 리스트를 마크다운 형식으로 변환했습니다.
+아래 이미지와 같이 넘버링 이나 불릿 포인트 처리가 된 리스트들은 어떻게 변경을 해줘야할까?
 
-```js
-for (let abstractNum of abstractNums) {
-  const abstractNumId = abstractNum.getAttribute("w:abstractNumId");
-  const lvls = abstractNum.getElementsByTagName("w:lvl");
+<p align="left">
+  <img width="300" alt="워드 하이퍼링크" src="./public/list.png">
+</p>
 
-  const levelsDefinition = {};
+넘버링이나, 불릿 포인트 역시 하이퍼링크와 마찬가지로, document.xml 문서 내에서는 <w:numId> 태그를 통해 ID값만 표시됩니다. 해당 요소가 점 리스트인지 숫자 리스트인지를 판별하기 위해서는 numbering.xml 파일을 확인해야 합니다. 여기서 해당 ID가 numbering.xml 내에서 어떠한 ID를 가지는지 확인하고, <w:numFmt>를 통해 리스트의 형태를 파악할 수 있습니다. 리스트를 마크다운으로 변환하기 위해서는 먼저 numbering.xml에서 <w:abstractNumId> 태그별로 각 리스트의 형태를 매핑합니다. 이후 매핑된 객체를 <w:numId>와 연결하여 해당 리스트를 마크다운 형식으로 변환했습니다.
 
-  for (let lvl of lvls) {
-    const ilvl = lvl.getAttribute("w:ilvl");
-    const numFmt = lvl
-      .getElementsByTagName("w:numFmt")[0]
-      .getAttribute("w:val");
-    const lvlText = lvl
-      .getElementsByTagName("w:lvlText")[0]
-      .getAttribute("w:val");
-    levelsDefinition[ilvl] = { numFmt, lvlText };
-  }
+<p align="left">
+  <img width="500" alt="워드 하이퍼링크" src="./public/markdownList.png">
+</p>
 
-  abstractNumIdToDefinition[abstractNumId] = levelsDefinition;
-}
-
-const numIdToDefinition = {};
-
-for (let num of nums) {
-  const numId = num.getAttribute("w:numId");
-  const abstractNumIdRef = num
-    .getElementsByTagName("w:abstractNumId")[0]
-    .getAttribute("w:val");
-
-  numIdToDefinition[numId] = abstractNumIdToDefinition[abstractNumIdRef];
-}
-```
+<br />
 
 ## 3. 추출한 이미지는 어떻게 변경해줄까?
 
@@ -307,6 +298,8 @@ DOCX 문서에 포함된 이미지를 추출한 뒤에 마크다운에 해당 �
 
 이미지를 인코딩 처리하는 경우 문서의 가독성과 관리 측면에서 나빠지는데 이는 사용자가 변환후에도 수정할 수 있게 마크다운 에디터 기능을 추가한 해당 프로젝트에서는 적합한 방법이 아니라고 판단하였습니다.
 
+<br />
+
 ### 3-2. S3에 이미지를 저장하고 경로를 받아 처리하는방법
 
 마크다운 에디터를 구현하면서 깃허브 마크다운 에디터를 많이 참고하였습니다. 이 방법의 경우 깃허브 마크다운 에디터에서 이미지를 드래그해서 드랍하면 해당 이미지가 저장소에 저장되고 이미지의 url경로가 삽입되는 형식에서 착안하여 추출한 이미지를 S3 저장소에 이미지를 저장하고 해당 이미지의 url경로를 반환받아 해당 경로를 마크다운에 삽입해주는 방식을 고민하였습니다.
@@ -320,6 +313,8 @@ DOCX 문서에 포함된 이미지를 추출한 뒤에 마크다운에 해당 �
 다만 단점으로는 사용자가 업로드하는 이미지가 개인적인 정보나 민감한 데이터를 포함할 수 있습니다. 이는 데이터 보안 및 개인 정보 보호 관련 문제를 야기할 수 있으며, 이를 관리하기 위한 추가적인 정책과 시스템이 필요합니다.
 
 또한 이미지 파일을 장기간 S3에 보유할 경우, 스토리지 비용이 증가할 수 있습니다. 마크다운 문서와 연결된 이미지의 사용 기간을 설정하고 관리하는 것이 어려울 수 있으며, 이는 비용 증가와 데이터 보유 정책의 복잡성을 초래합니다. 이러한 이슈는 클라우드 스토리지를 사용할 때 반드시 고려해야 할 중요한 요소입니다
+
+<br />
 
 ### 3-3. 이미지 압축하여 저장후 상대경로 지정하여 처리하는 방법
 
@@ -338,6 +333,8 @@ DOCX 문서에 포함된 이미지를 추출한 뒤에 마크다운에 해당 �
 
 위와 같은 이유로 이미지를 압축하여 저장 후 마크다운 문서에 상대경로로 삽입하는 방법을 선택하여 사용하였습니다.
 
+<br />
+
 ### 3-4. 상대경로 이미지를 프리뷰로 어떻게 보여줄까
 
 이미지를 마카다운 문서에 상대경로로 삽입하는 방법의 경우 당연하게도 프로젝트에서 구현한 마크다운에디터의 프리뷰에서는 해당 이미지가 보이지 않게됩니다.
@@ -345,30 +342,23 @@ DOCX 문서에 포함된 이미지를 추출한 뒤에 마크다운에 해당 �
 
 변환 과정에서, 렌더러는 먼저 이미지의 경로가 외부 URL인지 또는 상대경로인지를 판별합니다. 이를 위해, 이미지의 href 속성이 "http://" 또는 "https://"로 시작하는지를 확인하여 외부 URL인 경우와 그렇지 않은 경우를 구분합니다.
 
-```js
-renderer.image = function (href, title, text) {
-  const isHttpUrl = href.startsWith("http://") || href.startsWith("https://");
-
-  if (isHttpUrl) {
-    return `<img src="${href}" alt="${text}" title="${title}" class="max-w-[96%] h-auto block mx-auto">`;
-  } else {
-    return `
-      <div class="text-center image-container">
-        <img src="${href}" alt="${text}" title="${title}" class="max-w-[96%] h-auto block mx-auto">
-        <div class="text-xs text-gray-600">프리뷰를 위해 표시된 이미지입니다.</div>
-      </div>
-    `;
-  }
-};
-```
+<p align="left">
+  <img width="700" alt="워드 하이퍼링크" src="./public/previewImage2.png">
+</p>
 
 - 외부 URL인 경우, 이미지는 그대로 웹에서 접근 가능한 URL로 간주되어, 기본 <img> 태그를 사용하여 이미지를 표시합니다. 이 때, 이미지는 문서 내에서 적절히 크기 조정되어 중앙에 배치됩니다.
 
 - 상대경로인 경우, 상대경로로 지정된 이미지는 프로젝트 내의 리소스로 간주되며, 이 경우에는 추가적인 처리가 필요합니다. 이때, 렌더러는 <img> 태그를 포함하는 <div> 컨테이너를 생성합니다. 생성된 이미지 아래에는 "프리뷰를 위해 표시된 이미지입니다."라는 안내 메시지를 포함하여, 사용자가 보고 있는 이미지가 프리뷰 목적으로만 제공되는 것임을 명확히 합니다. 이 방식은 사용자가 문서의 원본 이미지와 프리뷰 이미지를 명확히 구분할 수 있게 돕습니다.
 
+<p align="left">
+  <img width="700" alt="워드 하이퍼링크" src="./public/previewImage.png">
+</p>
+
 이 방식을 통해 워드 문서에서 마크다운으로 변환되는 과정에서 상대경로로 지정된 이미지를 프리뷰에서도 표시함으로써 사용자 경험이 향상시켰습니다.
 
 <br></br>
+
+## 4. 어떻게 하면 자연스럽게 스크롤을 연동 시켜줄수 있을까?
 
 # **💭 Memoir**
 
