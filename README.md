@@ -142,6 +142,8 @@
   <img width="300" alt="문서를 선택하였을 경우" src="./public/markdown-converter-with-docx.png">
 </p>
 
+<br />
+
 ### 마크다운 변환
 
 - **Convert**버튼을 클릭하면, 업로드된 문서가 마크다운 형식으로 변환되어, 변환된 결과물이 자동으로 다운로드됩니다.
@@ -152,6 +154,8 @@
   <img width="300" alt="워드문서" src="./public/word.png">
   <img width="300" alt="마크다운" src="./public/markdown.png">
 </p>
+
+<br />
 
 ### 마크다운 에디터
 
@@ -170,6 +174,10 @@
 # **🧗🏻 Challenges**
 
 ## 1. 어떻게 워드문서를 마크다운으로 변경 할 수 있을까?
+
+<p align="center">
+  <img width="800" alt="logo" src="./public/docx_md_covert.png">
+</p>
 
 ### 1-1. DOCX 문서, XML 구조의 이해
 
