@@ -292,6 +292,39 @@ for (let relationship of relationships) {
 
 넘버링이나, 불릿 포인트 역시 하이퍼링크와 마찬가지로, document.xml 문서 내에서는 `<w:numId>` 태그를 통해 ID값만 표시됩니다. 해당 요소가 점 리스트인지 숫자 리스트인지를 판별하기 위해서는 numbering.xml 파일을 확인해야 합니다. 여기서 해당 ID가 numbering.xml 내에서 어떠한 ID를 가지는지 확인하고, `<w:numFmt>`를 통해 리스트의 형태를 파악할 수 있습니다. 리스트를 마크다운으로 변환하기 위해서는 먼저 numbering.xml에서 `<w:abstractNumId>` 태그별로 각 리스트의 형태를 매핑합니다. 이후 매핑된 객체를 `<w:numId>`와 연결하여 해당 리스트를 마크다운 형식으로 변환했습니다.
 
+```js
+for (let abstractNum of abstractNums) {
+  const abstractNumId = abstractNum.getAttribute("w:abstractNumId");
+  const lvls = abstractNum.getElementsByTagName("w:lvl");
+
+  const levelsDefinition = {};
+
+  for (let lvl of lvls) {
+    const ilvl = lvl.getAttribute("w:ilvl");
+    const numFmt = lvl
+      .getElementsByTagName("w:numFmt")[0]
+      .getAttribute("w:val");
+    const lvlText = lvl
+      .getElementsByTagName("w:lvlText")[0]
+      .getAttribute("w:val");
+    levelsDefinition[ilvl] = { numFmt, lvlText };
+  }
+
+  abstractNumIdToDefinition[abstractNumId] = levelsDefinition;
+}
+
+const numIdToDefinition = {};
+
+for (let num of nums) {
+  const numId = num.getAttribute("w:numId");
+  const abstractNumIdRef = num
+    .getElementsByTagName("w:abstractNumId")[0]
+    .getAttribute("w:val");
+
+  numIdToDefinition[numId] = abstractNumIdToDefinition[abstractNumIdRef];
+}
+```
+
 <p align="left">
   <img width="500" alt="워드 하이퍼링크" src="./public/markdownList.png">
 </p>
@@ -403,6 +436,23 @@ Base64를 사용해서 인코딩 처리하는 방법은 마크다운 에디터�
 이 과정은 마크다운에서 HTML로의 변환을 담당하는 렌더러의 이미지 처리 방식을 커스터마이징함으로써 이루어집니다.
 
 변환 과정에서, 렌더러는 먼저 이미지의 경로가 외부 URL인지 또는 상대경로인지를 판별합니다. 이를 위해, 이미지의 href 속성이 "http://" 또는 "https://"로 시작하는지를 확인하여 외부 URL인 경우와 그렇지 않은 경우를 구분합니다.
+
+```js
+renderer.image = function (href, title, text) {
+  const isHttpUrl = href.startsWith("http://") || href.startsWith("https://");
+
+  if (isHttpUrl) {
+    return `<img src="${href}" alt="${text}" title="${title}" class="max-w-[96%] h-auto block mx-auto">`;
+  } else {
+    return `
+      <div class="text-center image-container">
+        <img src="${href}" alt="${text}" title="${title}" class="max-w-[96%] h-auto block mx-auto">
+        <div class="text-xs text-gray-600">프리뷰를 위해 표시된 이미지입니다.</div>
+      </div>
+    `;
+  }
+};
+```
 
 <p align="center">
   <img width="700" alt="워드 하이퍼링크" src="./public/previewImage2.png">
