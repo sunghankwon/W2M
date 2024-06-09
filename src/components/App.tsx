@@ -4,16 +4,16 @@ import Header from "./Header";
 import DocxUploader from "./DocxUploader";
 import MarkdownConvert from "./MarkdownConvert";
 
-function App() {
+const App = (): JSX.Element => {
   return (
-    <div className="flex flex-col items-center w-full mx-auto max-w-screen-2\xl">
+    <div className="flex flex-col items-center w-full mx-auto max-w-screen-2xl">
       <Header />
       <Routes>
-        <Route path="/" exact element={<DocxUploader />} />
-        <Route path="/convert-markdown" exact element={<MarkdownConvert />} />
+        <Route path="/" element={<DocxUploader />} />
+        <Route path="/convert-markdown" element={<MarkdownConvert />} />
       </Routes>
     </div>
   );
-}
+};
 
 export default App;
