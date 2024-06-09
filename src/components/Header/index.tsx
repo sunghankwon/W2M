@@ -2,7 +2,7 @@ import useFullScreenStore from "../../store/useFullScreen";
 import w2mLogo from "../../assets/w2mLogo.png";
 import { useNavigate } from "react-router-dom";
 
-function Header() {
+const Header = (): JSX.Element | null => {
   const { isFullScreen } = useFullScreenStore();
   const navigate = useNavigate();
 
@@ -15,7 +15,7 @@ function Header() {
   };
 
   return (
-    <div className="flex items-center justify-center mt-8 mb-8">
+    <div className="flex items-center justify-center mt-8 mb-4">
       <button onClick={handleNavigateHome}>
         <img
           src={w2mLogo}
@@ -28,6 +28,6 @@ function Header() {
       </h1>
     </div>
   );
-}
+};
 
 export default Header;
