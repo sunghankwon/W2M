@@ -15,7 +15,7 @@ const Header = (): JSX.Element | null => {
   };
 
   return (
-    <div className="flex items-center justify-center mt-8 mb-4">
+    <div className="flex items-center justify-center mt-4">
       <button onClick={handleNavigateHome}>
         <img
           src={w2mLogo}
