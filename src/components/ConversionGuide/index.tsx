@@ -1,7 +1,6 @@
-import React from "react";
 import docxToMdIcon from "../../assets/d2m.png";
 
-function ConversionGuide() {
+const ConversionGuide = (): JSX.Element => {
   return (
     <div className="w-full pt-20 pb-20 mx-auto mt-40 mb-10 border-t border-b max-w-7xl">
       <h2 className="mb-5 text-2xl font-semibold sm:text-2xl md:text-3xl lg:text-4xl">
@@ -42,6 +41,6 @@ function ConversionGuide() {
       </div>
     </div>
   );
-}
+};
 
 export default ConversionGuide;
