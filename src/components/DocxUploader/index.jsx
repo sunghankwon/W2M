@@ -99,10 +99,14 @@ function DocxUploader() {
     }
   };
 
+  const scrollToBottom = () => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  };
+
   return (
     <>
       <div
-        className="flex flex-col items-center justify-center w-full mt-10 mb-4 max-w-none"
+        className="flex flex-col items-center justify-center w-full mt-4 mb-4 max-w-none"
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
@@ -150,7 +154,7 @@ function DocxUploader() {
         </label>
       </div>
 
-      <div className="flex flex-col items-center justify-center mt-10 mb-4">
+      <div className="flex flex-col items-center justify-center mt-2 mb-4">
         <div className="flex items-center justify-center mb-4 space-x-4">
           <div className="flex flex-col items-center">
             <img
@@ -178,6 +182,16 @@ function DocxUploader() {
           disabled={!fileInfo.file}
         >
           Convert
+        </button>
+        <button
+          className="relative mt-4 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold py-2 sm:py-3 md:py-4 rounded bg-green-600 text-white hover:bg-green-700"
+          onClick={scrollToBottom}
+        >
+          <div className="pt-20">
+            <span className="absolute top-0 left-1/2 w-6 h-6 ml-[-12px] border-l border-b border-gray-600 transform rotate-[-45deg] animate-sdb"></span>
+            <span className="absolute top-4 left-1/2 w-6 h-6 ml-[-12px] border-l border-b border-gray-600 transform rotate-[-45deg] animate-sdb delay-0.15s"></span>
+            <span className="absolute top-8 left-1/2 w-6 h-6 ml-[-12px] border-l border-b border-gray-600 transform rotate-[-45deg] animate-sdb delay-0.3s"></span>
+          </div>
         </button>
       </div>
       <ConversionGuide />

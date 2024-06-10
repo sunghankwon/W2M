@@ -2,6 +2,18 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+.pt-20 {
+  padding-top: 80px;
+}
+
+.delay-015s {
+  animation-delay: 0.15s;
+}
+
+.delay-03s {
+  animation-delay: 0.3s;
+}
+
 .markdown-preview h1 {
   font-size: 2.5em;
   margin-top: 0.5em;
