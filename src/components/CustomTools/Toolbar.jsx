@@ -1,18 +1,20 @@
 import { HeaderButton } from "./HeaderButton";
-import { BoldButton } from "./BoldButton";
-import { ItalicButton } from "./ItalicButton";
-import { UnderlineButton } from "./UnderlineButton";
-import { StrikethroughButton } from "./StrikethroughButton";
-import { QuoteButton } from "./QuoteButton";
+import {
+  BoldButton,
+  ItalicButton,
+  UnderlineButton,
+  StrikethroughButton,
+  QuoteButton,
+  TaskButton,
+  UnorderedListButton,
+  UpperCaseButton,
+  LowerCaseButton,
+  LinkButton,
+  ImageButton,
+} from "./ToolbarButton";
 import { CodeBlockButton } from "./CodeBlockButton";
-import { LinkButton } from "./LinkButton";
 import { CapitalizeButton } from "./CapitalizeButton";
-import { UpperCaseButton } from "./UpperCaseButton";
-import { LowerCaseButton } from "./LowerCaseButton";
 import { NumberListButton } from "./NumberListButton";
-import { UnorderedListButton } from "./UnorderedListButton";
-import { TaskButton } from "./TaskButton";
-import { ImageButton } from "./ImageButton";
 import { TableButton } from "./TableButton";
 import { DividerButton } from "./DividerButton";
 import { FullScreenButton } from "./FullScreenButton";
@@ -43,7 +45,11 @@ export function Toolbar({ editorRef, updateHistory }) {
         setCursorPosition={setCursorPosition}
         updateHistory={updateHistory}
       />
-      <UnderlineButton editorRef={editorRef} updateHistory={updateHistory} />
+      <UnderlineButton
+        editorRef={editorRef}
+        setCursorPosition={setCursorPosition}
+        updateHistory={updateHistory}
+      />
       <StrikethroughButton
         editorRef={editorRef}
         setCursorPosition={setCursorPosition}

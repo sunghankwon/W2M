@@ -1,16 +1,19 @@
 import { useEffect } from "react";
-
 import useMarkdownTextStore from "../../store/useMarkdownText";
-import strikethroughIcon from "../../assets/strikethrough.png";
 
-export function StrikethroughButton({
+export function SurroundTextButton({
   editorRef,
   setCursorPosition,
   updateHistory,
+  icon,
+  styleStart,
+  styleEnd,
+  shortcutKey,
+  testId,
 }) {
   const { markdownText, setMarkdownText } = useMarkdownTextStore();
 
-  const applyStrikethrough = () => {
+  const applyStyle = () => {
     const textarea = editorRef.current;
     let startPos = textarea.selectionStart;
     let endPos = textarea.selectionEnd;
@@ -23,41 +26,39 @@ export function StrikethroughButton({
     selectedText = selectedText.trim();
 
     let newText;
-
-    const hasStrikethroughBefore = textBefore.endsWith("~~");
-    const hasStrikethroughAfter = textAfter.startsWith("~~");
+    const hasStyleBefore = textBefore.endsWith(styleStart);
+    const hasStyleAfter = textAfter.startsWith(styleEnd);
 
     updateHistory(markdownText);
 
-    if (hasStrikethroughBefore && hasStrikethroughAfter && selectedText) {
+    if (hasStyleBefore && hasStyleAfter && selectedText) {
       newText =
-        textBefore.slice(0, -2) +
+        textBefore.slice(0, -styleStart.length) +
         leadingSpaces +
         selectedText +
         trailingSpaces +
-        textAfter.slice(2);
-      startPos -= 2;
-      endPos += 2;
+        textAfter.slice(styleEnd.length);
+      startPos -= styleStart.length;
+      endPos += styleEnd.length;
       const newCursorPos =
         startPos +
         leadingSpaces.length +
         selectedText.length +
         trailingSpaces.length -
-        2;
+        styleStart.length;
       setTimeout(() => {
         setCursorPosition(newCursorPos);
       }, 0);
-    } else if (
-      !hasStrikethroughBefore &&
-      !hasStrikethroughAfter &&
-      selectedText
-    ) {
+    } else if (!hasStyleBefore && !hasStyleAfter && selectedText) {
       if (
-        selectedText.startsWith("~~") &&
-        selectedText.endsWith("~~") &&
-        selectedText.length > 4
+        selectedText.startsWith(styleStart) &&
+        selectedText.endsWith(styleEnd) &&
+        selectedText.length > styleStart.length + styleEnd.length
       ) {
-        const trimmedText = selectedText.substring(2, selectedText.length - 2);
+        const trimmedText = selectedText.substring(
+          styleStart.length,
+          selectedText.length - styleEnd.length,
+        );
         newText =
           markdownText.substring(0, startPos) +
           leadingSpaces +
@@ -69,7 +70,7 @@ export function StrikethroughButton({
         newText =
           markdownText.substring(0, startPos) +
           leadingSpaces +
-          `~~${selectedText}~~` +
+          `${styleStart}${selectedText}${styleEnd}` +
           trailingSpaces +
           markdownText.substring(endPos);
         setTimeout(
@@ -78,27 +79,29 @@ export function StrikethroughButton({
               startPos +
                 leadingSpaces.length +
                 selectedText.length +
-                4 +
+                styleStart.length +
+                styleEnd.length +
                 trailingSpaces.length,
             ),
           0,
         );
       }
     } else {
-      newText = `${markdownText.substring(0, startPos)}~~~~${markdownText.substring(startPos)}`;
-      setTimeout(() => setCursorPosition(startPos + 2), 0);
+      newText = `${markdownText.substring(0, startPos)}${styleStart}${styleEnd}${markdownText.substring(startPos)}`;
+      setTimeout(() => setCursorPosition(startPos + styleStart.length), 0);
     }
 
     updateHistory(newText);
+
     setMarkdownText(newText);
     textarea.setSelectionRange(startPos, endPos);
     textarea.focus();
   };
 
   const handleShortcuts = (event) => {
-    if ((event.metaKey || event.ctrlKey) && event.key === "d") {
+    if ((event.metaKey || event.ctrlKey) && event.key === shortcutKey) {
       event.preventDefault();
-      applyStrikethrough();
+      applyStyle();
     }
   };
 
@@ -108,14 +111,15 @@ export function StrikethroughButton({
     return () => {
       document.removeEventListener("keydown", handleShortcuts);
     };
-  }, [applyStrikethrough]);
+  }, [markdownText]);
 
   return (
     <button
-      onClick={applyStrikethrough}
+      data-testid={testId}
+      onClick={applyStyle}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >
-      <img src={strikethroughIcon} className="h-5"></img>
+      <img src={icon} alt={testId} className="h-5" />
     </button>
   );
 }

@@ -1,35 +1,37 @@
+import { useEffect } from "react";
 import useMarkdownTextStore from "../../store/useMarkdownText";
-import taskIcon from "../../assets/task.png";
 
-export function TaskButton({ editorRef, setCursorPosition, updateHistory }) {
+export function PrefixTextButton({
+  editorRef,
+  setCursorPosition,
+  updateHistory,
+  icon,
+  styleStart,
+  shortcutKey,
+  testId,
+}) {
   const { markdownText, setMarkdownText } = useMarkdownTextStore();
 
-  const applyTaskList = () => {
+  const applyStyle = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;
     const endPos = textarea.selectionEnd;
     const selectedText = markdownText.substring(startPos, endPos);
 
     let newText;
-    let taskText = "";
+    let formattedText = "";
 
     updateHistory(markdownText);
 
     if (selectedText) {
       const textArray = selectedText.split("\n");
-
       for (let text of textArray) {
-        const headerMatch = text.match(/^(#+)(\s)?/);
-        if (headerMatch) {
-          taskText += `${text.substring(0, headerMatch[0].length)} - [ ] ${text.substring(headerMatch[0].length)}\n`;
-        } else {
-          taskText += `- [ ] ${text}\n`;
-        }
+        formattedText += `${styleStart}${text}\n`;
       }
 
       newText =
         markdownText.substring(0, startPos) +
-        taskText +
+        formattedText +
         markdownText.substring(endPos);
     } else {
       const beforeText = markdownText.substring(0, startPos);
@@ -41,23 +43,13 @@ export function TaskButton({ editorRef, setCursorPosition, updateHistory }) {
           : startPos + afterText.indexOf("\n");
       const lineText = markdownText.substring(startOfLine, endOfLine);
 
-      const headerMatch = lineText.match(/^(#+\s?)/);
-      let newLineText;
-      if (headerMatch) {
-        newLineText = lineText.replace(
-          headerMatch[0],
-          `${headerMatch[0]}- [ ] `,
-        );
-      } else {
-        newLineText = `- [ ] ${lineText}`;
-      }
-
       newText =
         markdownText.substring(0, startOfLine) +
-        newLineText +
+        styleStart +
+        lineText +
         markdownText.substring(endOfLine);
 
-      const cursorPositionOffset = headerMatch ? headerMatch[0].length + 6 : 6;
+      const cursorPositionOffset = styleStart.length;
       setTimeout(
         () => setCursorPosition(startOfLine + cursorPositionOffset),
         0,
@@ -69,13 +61,28 @@ export function TaskButton({ editorRef, setCursorPosition, updateHistory }) {
     textarea.focus();
   };
 
+  const handleShortcuts = (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === shortcutKey) {
+      event.preventDefault();
+      applyStyle();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleShortcuts);
+
+    return () => {
+      document.removeEventListener("keydown", handleShortcuts);
+    };
+  }, [markdownText]);
+
   return (
     <button
-      data-testid="taskButton"
-      onClick={applyTaskList}
+      data-testid={testId}
+      onClick={applyStyle}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >
-      <img src={taskIcon} className="h-5"></img>
+      <img src={icon} alt={testId} className="h-5" />
     </button>
   );
 }

@@ -1,10 +1,16 @@
+import React from "react";
 import useMarkdownTextStore from "../../store/useMarkdownText";
-import uppercaseIcon from "../../assets/uppercase.png";
 
-export function UpperCaseButton({ editorRef, updateHistory }) {
+export function CaseButton({
+  editorRef,
+  updateHistory,
+  icon,
+  transformCase,
+  altText,
+}) {
   const { markdownText, setMarkdownText } = useMarkdownTextStore();
 
-  const applyUppercase = () => {
+  const applyCaseTransform = () => {
     const textarea = editorRef.current;
     const startPos = textarea.selectionStart;
     const endPos = textarea.selectionEnd;
@@ -14,28 +20,30 @@ export function UpperCaseButton({ editorRef, updateHistory }) {
       return;
     }
 
+    const scrollTop = textarea.scrollTop;
+
     updateHistory(markdownText);
 
-    const uppercaseText = selectedText.toUpperCase();
+    const transformedText = transformCase(selectedText);
     const newText =
       markdownText.substring(0, startPos) +
-      uppercaseText +
+      transformedText +
       markdownText.substring(endPos);
 
-    updateHistory(newText);
     setMarkdownText(newText);
 
-    const newCursorPos = startPos + uppercaseText.length;
+    const newCursorPos = startPos + transformedText.length;
     textarea.focus();
     textarea.setSelectionRange(newCursorPos, newCursorPos);
+    textarea.scrollTop = scrollTop;
   };
 
   return (
     <button
-      onClick={applyUppercase}
+      onClick={applyCaseTransform}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >
-      <img src={uppercaseIcon} alt="Uppercase" className="h-5" />
+      <img src={icon} alt={altText} className="h-5" />
     </button>
   );
 }
