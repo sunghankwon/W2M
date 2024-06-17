@@ -1,16 +1,22 @@
-function parseRelationshipsData(relationshipsDataXml) {
+function parseRelationshipsData(relationshipsDataXml: string): {
+  [key: string]: string;
+} {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(
     relationshipsDataXml,
     "application/xml",
   );
   const relationships = xmlDoc.getElementsByTagName("Relationship");
-  const relationshipMap = {};
+  const relationshipMap: { [key: string]: string } = {};
 
-  for (let relationship of relationships) {
+  for (let i = 0; i < relationships.length; i++) {
+    const relationship = relationships[i];
     const id = relationship.getAttribute("Id");
     const target = relationship.getAttribute("Target");
-    relationshipMap[id] = target;
+
+    if (id && target) {
+      relationshipMap[id] = target;
+    }
   }
 
   return relationshipMap;
