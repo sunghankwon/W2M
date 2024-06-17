@@ -1,5 +1,8 @@
 import parseNumberingData from "./parseNumberingData";
 import parseRelationshipsData from "./parseRelationshipsData";
+import getHeadingLevel from "./getHeadingLevel";
+import getNumberingLevel from "./getNumberingLevel";
+import processChildNodes from "./processChildNodes";
 
 async function printTextNodes(
   node,
@@ -39,63 +42,16 @@ async function printTextNodes(
       }
 
       const styles = node.getElementsByTagName("w:pStyle");
-      for (let style of styles) {
-        const styleId = style.getAttribute("w:val");
-        switch (styleId) {
-          case "Title":
-          case "Heading1":
-            newHeadingLevel = "# ";
-            break;
-          case "Subtitle":
-          case "Heading2":
-            newHeadingLevel = "## ";
-            break;
-          case "Heading3":
-            newHeadingLevel = "### ";
-            break;
-          case "Heading4":
-            newHeadingLevel = "#### ";
-            break;
-          case "Heading5":
-            newHeadingLevel = "##### ";
-            break;
-          default:
-            newHeadingLevel = "###### ";
-            break;
-        }
-      }
+      newHeadingLevel = getHeadingLevel(styles);
 
       const numPr = node.getElementsByTagName("w:numPr")[0];
-      if (numPr) {
-        const numId = numPr
-          .getElementsByTagName("w:numId")[0]
-          .getAttribute("w:val");
-        const ilvlElement = numPr.getElementsByTagName("w:ilvl")[0];
-        const ilvl = ilvlElement ? ilvlElement.getAttribute("w:val") : "0";
-        const numberingDefinition =
-          numberingMap[numId] && numberingMap[numId][ilvl];
-
-        if (numberingDefinition) {
-          listItemCounters[numId] = listItemCounters[numId] || {};
-          listItemCounters[numId][ilvl] =
-            (listItemCounters[numId][ilvl] || 0) + 1;
-
-          let prefix = "";
-          if (numberingDefinition.numFmt === "bullet") {
-            prefix = "   ".repeat(parseInt(ilvl)) + "- ";
-          } else {
-            const counter = listItemCounters[numId][ilvl];
-            prefix =
-              "   ".repeat(parseInt(ilvl)) +
-              (ilvl === "0"
-                ? counter + "."
-                : String.fromCharCode(96 + counter) + ".");
-          }
-
-          newNumberingLevel = prefix + " ";
-          isListItem = true;
-        }
-      }
+      const numberingInfo = getNumberingLevel(
+        numPr,
+        numberingMap,
+        listItemCounters,
+      );
+      newNumberingLevel = numberingInfo.numberingLevel;
+      isListItem = numberingInfo.isListItem;
     } else if (node.nodeName === "w:r") {
       const childStyles = node.getElementsByTagName("w:rPr")[0];
       if (childStyles) {
@@ -182,22 +138,19 @@ async function printTextNodes(
       }
     }
 
-    for (const child of Array.from(node.childNodes)) {
-      const childMarkdown = await printTextNodes(
-        child,
-        docxFilesData,
-        "",
-        depth + 1,
-        newHeadingLevel,
-        newNumberingLevel,
-        newMarkdownSyntax,
-        listItemCounters,
-        isListItem,
-        processedImages,
-        addedImages,
-      );
-      markdown += childMarkdown;
-    }
+    markdown = await processChildNodes(
+      node,
+      docxFilesData,
+      markdown,
+      depth,
+      newHeadingLevel,
+      newNumberingLevel,
+      newMarkdownSyntax,
+      listItemCounters,
+      isListItem,
+      processedImages,
+      addedImages,
+    );
   }
 
   return markdown;
