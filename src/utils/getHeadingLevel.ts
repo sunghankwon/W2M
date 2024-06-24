@@ -1,6 +1,6 @@
-function getHeadingLevel(styles) {
+function getHeadingLevel(styles: Element[]): string {
   let headingLevel = "";
-  for (let style of styles) {
+  for (const style of styles) {
     const styleId = style.getAttribute("w:val");
     switch (styleId) {
       case "Title":
