@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import JSZip from "jszip";
 
 import ConversionGuide from "../ConversionGuide";
 import useFileNameStore from "../../store/useFileName";
 import useDocxXmlStore from "../../store/useDocxXml";
+import processFile from "../../utils/processFile";
+import extractDocxData from "../../utils/extractDocxData";
 import docxImage from "../../assets/docx.png";
 import markdownImage from "../../assets/markdown.png";
 import fileSearchIcon from "../../assets/file.png";
 
 function DocxUploader() {
-  const [labelText, setLabelText] = useState("Choose Word file");
+  const [labelText, setLabelText] = useState(
+    "Choose a Word file or drag it here",
+  );
   const [fileInfo, setFileInfo] = useState({ name: "", icon: "", file: null });
   const { setDocxXmlData, setDocxFilesData } = useDocxXmlStore();
   const { setFileName } = useFileNameStore();
@@ -23,20 +26,7 @@ function DocxUploader() {
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    processFile(file);
-  };
-
-  const processFile = (file) => {
-    if (file) {
-      const fileExtension = file.name.split(".").pop().toLowerCase();
-      if (fileExtension !== "docx") {
-        setLabelText("Please insert a 'docx' file");
-        setFileInfo({ name: "", icon: "", file: null });
-      } else {
-        setLabelText("File ready to convert");
-        setFileInfo({ name: file.name, icon: docxImage, file: file });
-      }
-    }
+    processFile(file, setFileInfo, setLabelText, docxImage);
   };
 
   const clearSelection = (event) => {
@@ -44,7 +34,7 @@ function DocxUploader() {
     event.preventDefault();
 
     setFileInfo({ name: "", icon: "", file: null });
-    setLabelText("Choose Word file");
+    setLabelText("Choose a Word file or drag it here");
     document.getElementById("fileInput").value = "";
   };
 
@@ -55,40 +45,16 @@ function DocxUploader() {
   const handleDrop = (event) => {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
-    processFile(file);
+    processFile(file, setFileInfo, setLabelText, docxImage);
   };
 
   const handleConvert = async () => {
     if (fileInfo.file) {
       setFileName(fileInfo.name);
       try {
-        const zip = await JSZip.loadAsync(fileInfo.file);
-        console.log(zip);
-        const xmlData = await zip.file("word/document.xml").async("string");
+        const { xmlData, docxFilesData } = await extractDocxData(fileInfo.file);
         setDocxXmlData(xmlData);
         localStorage.setItem("docxXmlData", xmlData);
-
-        let docxFilesDataPromises = [];
-
-        zip.forEach((relativePath, file) => {
-          if (!file.dir) {
-            let asyncType = "string";
-            if (relativePath.startsWith("word/media/")) {
-              asyncType = "blob";
-            }
-            docxFilesDataPromises.push(
-              file.async(asyncType).then((content) => {
-                return { key: relativePath, value: content };
-              }),
-            );
-          }
-        });
-
-        let results = await Promise.all(docxFilesDataPromises);
-        let docxFilesData = {};
-        results.forEach(({ key, value }) => {
-          docxFilesData[key] = value;
-        });
 
         setDocxFilesData(docxFilesData);
 
