@@ -21,7 +21,6 @@ function DocxUploader() {
 
   useEffect(() => {
     setDocxFilesData("");
-    setDocxFilesData("");
   }, []);
 
   const handleFileChange = (event) => {
