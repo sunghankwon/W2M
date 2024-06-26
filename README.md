@@ -114,7 +114,7 @@ document.xml에서 문서의 구조를 나타내는 주요태그들은 아래와
 - `<w:tblPr>` : 테이블의 속성들을 정의합니다.
 - `<w:drawing>` : 문서 내에 그림(이미지)을 포함하는 데 사용되는 태그입니다.
 
-위의 태그들을 중심으로, 각각 내부 태그들의 속성들을 확인하여 Markdown으로 변환하는 로직을 구성하였습니다. 이를 통해 문서 내의 구조와 스타일을 유지하면서도 마크다운 형식으로 손쉽게 변환할 수 있습니다.
+위의 태그들을 중심으로, 각각 내부 태그들의 속성들을 확인하여 마크다운으로 변환하는 로직을 구성하였습니다. 이를 통해 문서 내의 구조와 스타일을 유지하면서도 마크다운 형식으로 손쉽게 변환할 수 있습니다.
 
 <br />
 
@@ -127,36 +127,82 @@ document.xml를 기준으로 마크다운으로 변환해주는 로직에 대해
   </p>
 
 ```js
-if (node.nodeType === 3 && node.textContent.trim()) {
-  // 생략
-  const content = `${headingLevel}${numberingLevel}${markdownSyntax}${node.textContent.trim()}${syntaxReverse}`;
-  markdown += isListItem || depth === 0 ? `${content}` : `${content} `;
-} else if (node.nodeType === 1) {
-  if (node.nodeName === "w:p") {
-    if (!markdown.endsWith("\n\n")) {
-      markdown += "\n";
-    }
-    // 생략
-  }
+/**
+ * DOCX 파일의 XML 노드를 재귀적으로 탐색하여 마크다운 형식으로 변환하는 함수
+ *
+ * node - 현재 처리 중인 XML 노드
+ * docxFilesData - DOCX 파일의 데이터 맵
+ * markdown - 현재까지 변환된 마크다운 텍스트
+ * depth - 현재 노드의 깊이
+ * headingLevel - 현재 노드의 헤딩 레벨 (예: "#", "##")
+ * numberingLevel - 현재 노드의 번호 매기기 레벨 (예: "1. ", "1.1. ")
+ * markdownSyntax - 현재 노드의 마크다운 구문 (예: "**", "_")
+ * listItemCounters - 목록 항목의 카운터를 추적하는 객체
+ * isListItem - 현재 노드가 목록 항목인지 여부
+ */
 
-  for (const child of Array.from(node.childNodes)) {
-    const childMarkdown = await printTextNodes(
-      child,
+async function printTextNodes(
+  node,
+  docxFilesData,
+  markdown = "",
+  depth = 0,
+  headingLevel = "",
+  numberingLevel = "",
+  markdownSyntax = "",
+  listItemCounters = {},
+  isListItem = false,
+  processedImages = new Set(),
+  addedImages = new Set(),
+) {
+  // 관계 데이터와 넘버링 데이터를 파싱합니다.
+  const relationshipsMap = parseRelationshipsData(
+    docxFilesData["word/_rels/document.xml.rels"],
+  );
+  const numberingMap = parseNumberingData(docxFilesData["word/numbering.xml"]);
+
+  // 텍스트 노드 처리
+  if (node.nodeType === 3 && node.textContent.trim()) {
+    const content = `${headingLevel}${numberingLevel}${markdownSyntax}${node.textContent.trim()}${syntaxReverse}`;
+    markdown += isListItem || depth === 0 ? `${content}` : `${content} `;
+  }
+  // 엘리먼트 노드 처리
+  else if (node.nodeType === 1) {
+    // 단락 처리
+    if (node.nodeName === "w:p") {
+      if (!markdown.endsWith("\n\n")) {
+        markdown += "\n";
+      }
+
+      const styles = node.getElementsByTagName("w:pStyle");
+      headingLevel = getHeadingLevel(styles);
+
+      const numPr = node.getElementsByTagName("w:numPr")[0];
+      const numberingInfo = getNumberingLevel(
+        numPr,
+        numberingMap,
+        listItemCounters,
+      );
+      numberingLevel = numberingInfo.numberingLevel;
+      isListItem = numberingInfo.isListItem;
+    }
+    // 재귀적으로 자식 노드를 처리
+    markdown = await processChildNodes(
+      node,
       docxFilesData,
-      "",
-      depth + 1,
-      newHeadingLevel,
-      newNumberingLevel,
-      newMarkdownSyntax,
+      markdown,
+      depth,
+      headingLevel,
+      numberingLevel,
+      markdownSyntax,
       listItemCounters,
       isListItem,
       processedImages,
       addedImages,
     );
-    markdown += childMarkdown;
   }
+
+  return markdown;
 }
-// 생략
 ```
 
 <br />
@@ -173,13 +219,22 @@ document.xml 문서에는 해당 요소가 하이퍼링크 속성을 가지고 �
 </p>
 
 ```js
+// "Relationship" 태그를 모두 가져옴
 const relationships = xmlDoc.getElementsByTagName("Relationship");
+
+// 관계 ID와 대상(Target)을 저장할 객체
 const relationshipMap = {};
 
-for (let relationship of relationships) {
+// 각 "Relationship" 태그를 순회하며 ID와 Target을 추출하여 객체에 저장
+for (let i = 0; i < relationships.length; i++) {
+  const relationship = relationships[i];
   const id = relationship.getAttribute("Id");
   const target = relationship.getAttribute("Target");
-  relationshipMap[id] = target;
+
+  // ID와 Target이 존재하는 경우에만 객체에 저장
+  if (id && target) {
+    relationshipMap[id] = target;
+  }
 }
 ```
 
@@ -196,12 +251,14 @@ for (let relationship of relationships) {
 넘버링이나, 불릿 포인트 역시 하이퍼링크와 마찬가지로, document.xml 문서 내에서는 `<w:numId>` 태그를 통해 ID값만 표시됩니다. 해당 요소가 점 리스트인지 숫자 리스트인지를 판별하기 위해서는 numbering.xml 파일을 확인해야 합니다. 여기서 해당 ID가 numbering.xml 내에서 어떠한 ID를 가지는지 확인하고, `<w:numFmt>`를 통해 리스트의 형태를 파악할 수 있습니다. 리스트를 마크다운으로 변환하기 위해서는 먼저 numbering.xml에서 `<w:abstractNumId>` 태그별로 각 리스트의 형태를 매핑합니다. 이후 매핑된 객체를 `<w:numId>`와 연결하여 해당 리스트를 마크다운 형식으로 변환했습니다.
 
 ```js
+// 각 abstractNum 요소를 순회하며 abstractNumId와 그 하위의 lvl 요소를 추출
 for (let abstractNum of abstractNums) {
   const abstractNumId = abstractNum.getAttribute("w:abstractNumId");
   const lvls = abstractNum.getElementsByTagName("w:lvl");
 
   const levelsDefinition = {};
 
+  // 각 레벨(lvl) 요소를 순회하며 레벨 ID(ilvl), 번호 형식(numFmt), 레벨 텍스트(lvlText)를 추출
   for (let lvl of lvls) {
     const ilvl = lvl.getAttribute("w:ilvl");
     const numFmt = lvl
@@ -213,17 +270,20 @@ for (let abstractNum of abstractNums) {
     levelsDefinition[ilvl] = { numFmt, lvlText };
   }
 
+  // 추출된 레벨 정의를 abstractNumIdToDefinition 객체에 저장
   abstractNumIdToDefinition[abstractNumId] = levelsDefinition;
 }
 
 const numIdToDefinition = {};
 
+// 각 번호 매기기(num) 요소를 순회하며 numId와 해당하는 abstractNumId를 추출
 for (let num of nums) {
   const numId = num.getAttribute("w:numId");
   const abstractNumIdRef = num
     .getElementsByTagName("w:abstractNumId")[0]
     .getAttribute("w:val");
 
+  // numId와 추출된 abstractNumIdRef를 사용하여 numIdToDefinition 객체에 매핑
   numIdToDefinition[numId] = abstractNumIdToDefinition[abstractNumIdRef];
 }
 ```
