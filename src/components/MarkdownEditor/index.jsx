@@ -38,23 +38,24 @@ function MarkdownEditor({
     };
   }, []);
 
+  const updateText = (newHistoryIndex) => {
+    historyIndexRef.current = newHistoryIndex;
+    const value = historyRef.current[newHistoryIndex];
+    setMarkdownText(value);
+    scrollToLastEditPosition();
+  };
+
   const undo = () => {
     const newHistoryIndex = historyIndexRef.current - 1;
     if (newHistoryIndex < 0) return;
-    historyIndexRef.current = newHistoryIndex;
-    const previousValue = historyRef.current[newHistoryIndex];
-    setMarkdownText(previousValue);
-    scrollToLastEditPosition();
+    updateText(newHistoryIndex);
   };
 
   const redo = () => {
     const maxIndex = historyRef.current.length - 1;
     const newHistoryIndex = historyIndexRef.current + 1;
     if (newHistoryIndex > maxIndex) return;
-    historyIndexRef.current = newHistoryIndex;
-    const nextValue = historyRef.current[newHistoryIndex];
-    setMarkdownText(nextValue);
-    scrollToLastEditPosition();
+    updateText(newHistoryIndex);
   };
 
   const scrollToLastEditPosition = () => {
