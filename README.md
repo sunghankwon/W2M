@@ -37,6 +37,9 @@
   - [선택된 텍스트 확인 방법](#5-1-텍스트가-선택-됐는지는-어떻게-알수있을까)
   - [텍스트 앞뒤에 오는 문법 처리](#5-2-텍스트의-앞뒤에-오는-문법)
   - [문장의 맨 앞에 오는 문법 처리](#5-3-텍스트의-앞에-오는-문법)
+  6. [undo와 redo를 직접 구현해 보자!](#6-undo와-redo-기능을-어떻게-구현할-수-있을까)
+  - [텍스트에어리어에서는 기본적으로 undo, redo가 적용되지 않는다.](#6-1-텍스트에어리어의-제한-사항)
+  - [undo, redo를 어떻게 구현하였는가?](#6-2-undo와-redo-기능의-동작-원리)
 - [🛠 Tech Stacks](#🛠-tech-stacks)
 - [📆 Project timeline](#📆-project-timeline)
 - [🕹️ Features](#🕹️-features)
@@ -523,6 +526,65 @@ HTML `<textarea>`요소의 속성 `selectionStart`와 `selectionEnd`를 사용�
 <img src="./public/numbering_and_bullet_point_example.gif" alt="scrollSync" /><br />
 
 이와 같이 마크다운 문법을 적용하여 사용자들은 더욱 직관적이고 편리하게 마크다운 문법을 사용할 수 있는 툴바를 구현할 수 있었고, 이러한 접근 방식을 통해 마크다운 에디터의 편의성을 향상시킬 수 있었습니다.
+
+## 6. Undo와 Redo 기능을 어떻게 구현할 수 있을까?
+
+마크다운 에디터를 구현하면서, 사용자가 편리하게 텍스트를 수정하고 되돌릴 수 있도록 undo와 redo 기능을 추가했습니다. 이를 통해 사용자는 실수로 변경된 내용을 쉽게 복원하거나 취소할 수 있게 되었습니다. 이 기능의 핵심은 텍스트 변경 내역을 추적하고, 필요 시 이전 상태로 되돌리는 것입니다.
+
+### 6-1. 텍스트에어리어의 제한 사항
+
+텍스트 입력 필드로 textarea 요소를 사용했습니다. 그러나 textarea에는 기본적으로 undo와 redo 기능이 적용되지 않는다는 사실을 확인했습니다. 이는 사용자가 실수로 텍스트를 삭제하거나 변경했을 때, 이를 복원할 수 있는 방법이 없다는 것을 의미합니다. 이러한 문제를 해결하기 위해, undo와 redo 기능을 직접 구현하기로 결정했습니다.
+
+### 6-2. Undo와 Redo 기능의 동작 원리
+
+undo와 redo 기능을 구현하기 위해 텍스트에 공백이나 줄바꿈이 추가되거나 툴바의 버튼을 사용할 때마다 해당 변경 내역을 히스토리에 저장하였습니다.
+
+```js
+// 히스토리 인덱스를 업데이트하고 텍스트를 변경하는 함수
+const updateText = (newHistoryIndex) => {
+  historyIndexRef.current = newHistoryIndex; // 현재 히스토리 인덱스를 업데이트
+  const value = historyRef.current[newHistoryIndex]; // 새로운 히스토리 인덱스에 해당하는 텍스트 값을 가져옴
+  setMarkdownText(value); // 마크다운 텍스트 상태를 업데이트
+  scrollToLastEditPosition(); // 마지막 편집 위치로 스크롤
+};
+
+// Undo 기능을 수행하는 함수
+const undo = () => {
+  const newHistoryIndex = historyIndexRef.current - 1; // 새로운 히스토리 인덱스를 현재 인덱스보다 하나 이전으로 설정
+  if (newHistoryIndex < 0) return; // 새로운 히스토리 인덱스가 0보다 작으면(처음 상태라면) 함수를 종료
+  updateText(newHistoryIndex); // 텍스트를 이전 상태로 업데이트
+};
+
+// Redo 기능을 수행하는 함수
+const redo = () => {
+  const maxIndex = historyRef.current.length - 1; // 히스토리의 마지막 인덱스를 계산
+  const newHistoryIndex = historyIndexRef.current + 1; // 새로운 히스토리 인덱스를 현재 인덱스보다 하나 이후로 설정
+  if (newHistoryIndex > maxIndex) return; // 새로운 히스토리 인덱스가 마지막 인덱스를 초과하면 함수를 종료
+  updateText(newHistoryIndex); // 텍스트를 다음 상태로 업데이트
+};
+```
+
+초기에는 텍스트가 변경될 때마다 히스토리에 저장하는 방식으로 진행했는데, 이 경우 텍스트를 입력할 때마다 히스토리에 저장되어 타이핑하는 동작 하나하나가 히스토리에 추가되었습니다. 예를 들어, 'hello'라는 단어를 입력할 때, 'h', 'he', 'hel', 'hell', 'hello' 각각이 히스토리 항목으로 저장되어 불필요하게 많은 히스토리 항목이 생성되었습니다.
+
+이로 인해 히스토리 항목이 많아져 메모리 사용량이 증가하고, undo 및 redo 작업 시 많은 항목을 처리해야 하므로 성능이 저하되고 사용자 편의성이 떨어진다고 판단했습니다. 따라서 공백이나 줄바꿈을 기준으로 히스토리에 저장하는 방식으로 변경했습니다.
+
+```js
+if (newValue.endsWith(" ") || newValue.endsWith("\n")) {
+  const newHistoryIndex = historyIndexRef.current + 1; // 텍스트가 공백 또는 줄 바꿈으로 끝나면 히스토리 인덱스를 증가
+  historyRef.current = historyRef.current.slice(0, newHistoryIndex);
+  historyRef.current.push(newValue); // 히스토리 배열을 현재 인덱스까지 자르고 새로운 값을 추가
+  historyIndexRef.current = newHistoryIndex; // 히스토리 인덱스를 업데이트
+  lastEditPositionRef.current = event.target.scrollTop; // 마지막 편집 위치를 기록
+}
+```
+
+이 경우, 텍스트 입력 중에 공백이나 줄 바꿈이 발생할 때만 히스토리에 저장되어 의미 있는 변경 사항만 추가됩니다. 이는 불필요한 히스토리 항목 생성을 방지하여 히스토리를 효율적으로 관리할 수 있게 하고, 한 문장이나 단어 단위로 undo 및 redo 작업을 수행할 수 있어 보다 직관적인 사용자 경험을 제공하였습니다.
+
+추가로, 현재 히스토리 인덱스를 추적하여 undo와 redo 시 적절한 텍스트 상태로 이동하도록 하였습니다. 사용자가 undo 또는 redo 명령을 입력하면 히스토리 인덱스를 조정하여 이전 또는 다음 상태로 전환할 수 있게 하여, 실질적으로 의미 있는 작업 단위로 히스토리가 관리되어 더욱 유용하게 사용할 수 있습니다.
+
+또한, 단축키 기능을 추가하여 사용자 편의성을 더욱 향상시켰습니다. Ctrl+Z 또는 Cmd+Z를 눌러 undo 기능을, Ctrl+Shift+Z 또는 Cmd+Shift+Z를 눌러 redo 기능을 사용할 수 있게 하여, 사용자가 키보드만으로도 손쉽게 편집 작업을 되돌리거나 다시 수행할 수 있도록 구현 하였습니다.
+
+<img src="./public/editor_undo_redo_usage.gif" alt="undo_redo_usage" />
 
 <br />
 <br />
