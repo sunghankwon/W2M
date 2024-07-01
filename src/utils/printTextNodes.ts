@@ -4,19 +4,29 @@ import getHeadingLevel from "./getHeadingLevel";
 import getNumberingLevel from "./getNumberingLevel";
 import processChildNodes from "./processChildNodes";
 
+interface DocxFilesData {
+  [key: string]: string;
+}
+
+interface ListItemCounters {
+  [numId: string]: {
+    [ilvl: string]: number;
+  };
+}
+
 async function printTextNodes(
-  node,
-  docxFilesData,
-  markdown = "",
-  depth = 0,
-  headingLevel = "",
-  numberingLevel = "",
-  markdownSyntax = "",
-  listItemCounters = {},
-  isListItem = false,
-  processedImages = new Set(),
-  addedImages = new Set(),
-) {
+  node: ChildNode,
+  docxFilesData: DocxFilesData,
+  markdown: string = "",
+  depth: number = 0,
+  headingLevel: string = "",
+  numberingLevel: string = "",
+  markdownSyntax: string = "",
+  listItemCounters: ListItemCounters = {},
+  isListItem: boolean = false,
+  processedImages: Set<string> = new Set(),
+  addedImages: Set<string> = new Set(),
+): Promise<string> {
   const relationshipsDataXml = docxFilesData["word/_rels/document.xml.rels"];
   const numberingDataXml = docxFilesData["word/numbering.xml"];
 
@@ -27,7 +37,7 @@ async function printTextNodes(
   let newMarkdownSyntax = markdownSyntax;
   let newNumberingLevel = numberingLevel;
 
-  if (node.nodeType === 3 && node.textContent.trim()) {
+  if (node.nodeType === 3 && node.textContent?.trim()) {
     const syntaxReverse = markdownSyntax
       .split("")
       .reverse()
@@ -41,10 +51,11 @@ async function printTextNodes(
         markdown += "\n";
       }
 
-      const styles = node.getElementsByTagName("w:pStyle");
-      newHeadingLevel = getHeadingLevel(styles);
+      const styles = (node as Element).getElementsByTagName("w:pStyle");
+      const stylesArray = Array.from(styles);
+      newHeadingLevel = getHeadingLevel(stylesArray);
 
-      const numPr = node.getElementsByTagName("w:numPr")[0];
+      const numPr = (node as Element).getElementsByTagName("w:numPr")[0];
       const numberingInfo = getNumberingLevel(
         numPr,
         numberingMap,
@@ -53,7 +64,7 @@ async function printTextNodes(
       newNumberingLevel = numberingInfo.numberingLevel;
       isListItem = numberingInfo.isListItem;
     } else if (node.nodeName === "w:r") {
-      const childStyles = node.getElementsByTagName("w:rPr")[0];
+      const childStyles = (node as Element).getElementsByTagName("w:rPr")[0];
       if (childStyles) {
         if (childStyles.getElementsByTagName("w:b").length > 0)
           newMarkdownSyntax += "**";
@@ -63,8 +74,8 @@ async function printTextNodes(
           newMarkdownSyntax += "<u>";
       }
     } else if (node.nodeName === "w:hyperlink") {
-      const linkId = node.getAttribute("r:id");
-      const targetUrl = relationshipsMap[linkId];
+      const linkId = (node as Element).getAttribute("r:id");
+      const targetUrl = relationshipsMap[linkId ?? ""];
       if (targetUrl) {
         let linkMarkdown = "";
         for (const child of Array.from(node.childNodes)) {
@@ -88,51 +99,53 @@ async function printTextNodes(
         return markdown;
       }
     } else if (node.nodeName === "w:tbl") {
-      let rowsMarkdown = [];
+      const rowsMarkdown: string[] = [];
       let headerSeparator = "|";
       let isHeader = true;
 
-      Array.from(node.getElementsByTagName("w:tr")).forEach((tr, rowIndex) => {
-        let rowMarkdown = "|";
-        Array.from(tr.getElementsByTagName("w:tc")).forEach((tc, cellIndex) => {
-          let cellText = "";
-          Array.from(tc.getElementsByTagName("w:t")).forEach((t) => {
-            cellText += t.textContent;
+      Array.from((node as Element).getElementsByTagName("w:tr")).forEach(
+        (tr) => {
+          let rowMarkdown = "|";
+          Array.from(tr.getElementsByTagName("w:tc")).forEach((tc) => {
+            let cellText = "";
+            Array.from(tc.getElementsByTagName("w:t")).forEach((t) => {
+              cellText += t.textContent;
+            });
+
+            rowMarkdown += ` ${cellText} |`;
+
+            if (isHeader) {
+              headerSeparator += " ------ |";
+            }
           });
 
-          rowMarkdown += ` ${cellText} |`;
+          rowsMarkdown.push(rowMarkdown);
 
           if (isHeader) {
-            headerSeparator += " ------ |";
+            rowsMarkdown.push(headerSeparator);
+            isHeader = false;
           }
-        });
-
-        rowsMarkdown.push(rowMarkdown);
-
-        if (isHeader) {
-          rowsMarkdown.push(headerSeparator);
-          isHeader = false;
-        }
-      });
+        },
+      );
 
       markdown += rowsMarkdown.join("\n") + "\n";
 
       return markdown;
     } else if (node.nodeName === "w:pict") {
-      const rectElements = node.getElementsByTagName("v:rect");
+      const rectElements = (node as Element).getElementsByTagName("v:rect");
       if (rectElements.length > 0) {
         markdown += "---";
       }
     } else if (node.nodeName === "wp:inline" || node.nodeName === "w:drawing") {
-      const blipElements = node.getElementsByTagName("a:blip");
-      for (let blip of blipElements) {
+      const blipElements = (node as Element).getElementsByTagName("a:blip");
+      for (const blip of blipElements) {
         const rEmbed = blip.getAttribute("r:embed");
-        const imgFilePath = relationshipsMap[rEmbed];
+        const imgFilePath = relationshipsMap[rEmbed ?? ""];
         const completeImgFilePath = `word/${imgFilePath}`;
 
         markdown += `![Image](./${completeImgFilePath})\n`;
         addedImages.add(completeImgFilePath);
-        processedImages.add(rEmbed);
+        processedImages.add(rEmbed ?? "");
 
         return markdown;
       }
