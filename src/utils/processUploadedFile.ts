@@ -1,4 +1,15 @@
-const processUploadedFile = (file, setFileInfo, setLabelText, docxImage) => {
+interface FileInfo {
+  name: string;
+  icon: string;
+  file: File;
+}
+
+const processUploadedFile = (
+  file: File,
+  setFileInfo: (info: FileInfo) => void,
+  setLabelText: (text: string) => void,
+  docxImage: string,
+): void => {
   const reader = new FileReader();
   reader.onload = () => {
     setFileInfo({
