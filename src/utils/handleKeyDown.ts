@@ -1,4 +1,8 @@
-const handleKeyDown = (event, undo, redo) => {
+const handleKeyDown = (
+  event: KeyboardEvent,
+  undo: () => void,
+  redo: () => void,
+): void => {
   if (event.metaKey || event.ctrlKey) {
     if (event.key === "z" && !event.shiftKey) {
       event.preventDefault();
