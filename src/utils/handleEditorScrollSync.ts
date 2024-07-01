@@ -1,11 +1,13 @@
+import { RefObject, MutableRefObject } from "react";
+
 const handleEditorScrollSync = (
-  editorRef,
-  previewRef,
-  isProgrammaticScroll,
-  newValue,
-) => {
+  editorRef: RefObject<HTMLTextAreaElement>,
+  previewRef: RefObject<HTMLDivElement>,
+  isProgrammaticScroll: MutableRefObject<boolean>,
+  newValue: string,
+): void => {
   isProgrammaticScroll.current = true;
-  const currentScrollTop = editorRef.current.scrollTop;
+  const currentScrollTop = editorRef.current?.scrollTop ?? 0;
 
   setTimeout(() => {
     isProgrammaticScroll.current = false;
