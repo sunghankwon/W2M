@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { Toolbar } from "../CustomTools/Toolbar";
 import useMarkdownTextStore from "../../store/useMarkdownText";
@@ -18,6 +18,7 @@ function MarkdownEditor({
     setMarkdownText,
     editorRef,
   );
+  const isHistoryUpdating = useRef(false);
 
   useEffect(() => {
     const textarea = editorRef.current;
@@ -32,7 +33,6 @@ function MarkdownEditor({
 
   const handleChange = (event) => {
     const newValue = event.target.value;
-
     setMarkdownText(newValue);
     handleEditorScrollSync(
       editorRef,
@@ -43,6 +43,15 @@ function MarkdownEditor({
 
     if (newValue.endsWith(" ") || newValue.endsWith("\n")) {
       updateHistory(newValue);
+      isHistoryUpdating.current = false;
+      lastEditPositionRef.current = event.target.scrollTop;
+    } else {
+      if (!isHistoryUpdating.current) {
+        updateHistory(newValue);
+        isHistoryUpdating.current = true;
+      } else {
+        updateHistory(newValue, true);
+      }
       lastEditPositionRef.current = event.target.scrollTop;
     }
   };

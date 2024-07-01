@@ -1,5 +1,4 @@
 import { useRef } from "react";
-import scrollToLastEditPosition from "../utils/scrollToLastEditPosition";
 
 const useMarkdownHistory = (initialText, setMarkdownText, editorRef) => {
   const historyRef = useRef([initialText]);
@@ -10,7 +9,7 @@ const useMarkdownHistory = (initialText, setMarkdownText, editorRef) => {
     historyIndexRef.current = newHistoryIndex;
     const value = historyRef.current[newHistoryIndex];
     setMarkdownText(value);
-    scrollToLastEditPosition(editorRef, lastEditPositionRef);
+    scrollToLastEditPosition();
   };
 
   const undo = () => {
@@ -26,11 +25,22 @@ const useMarkdownHistory = (initialText, setMarkdownText, editorRef) => {
     updateText(newHistoryIndex);
   };
 
-  const updateHistory = (newText) => {
-    const newHistoryIndex = historyIndexRef.current + 1;
-    historyRef.current = historyRef.current.slice(0, newHistoryIndex);
-    historyRef.current.push(newText);
-    historyIndexRef.current = newHistoryIndex;
+  const scrollToLastEditPosition = () => {
+    const textarea = editorRef.current;
+    if (textarea) {
+      textarea.scrollTop = lastEditPositionRef.current;
+    }
+  };
+
+  const updateHistory = (newText, replaceLast = false) => {
+    if (replaceLast) {
+      historyRef.current[historyIndexRef.current] = newText;
+    } else {
+      const newHistoryIndex = historyIndexRef.current + 1;
+      historyRef.current = historyRef.current.slice(0, newHistoryIndex);
+      historyRef.current.push(newText);
+      historyIndexRef.current = newHistoryIndex;
+    }
   };
 
   return {
