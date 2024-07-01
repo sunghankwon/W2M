@@ -4,11 +4,26 @@ import useFileNameStore from "../store/useFileName";
 import useDocxXmlStore from "../store/useDocxXml";
 import extractDocxData from "../utils/extractDocxData";
 
+interface FileInfo {
+  name: string;
+  icon: string;
+  file: File | null;
+}
+
+interface ExtractedData {
+  xmlData: string;
+  docxFilesData: Record<string, string>;
+}
+
 const useFileUpload = () => {
-  const [labelText, setLabelText] = useState(
+  const [labelText, setLabelText] = useState<string>(
     "Choose a Word file or drag it here",
   );
-  const [fileInfo, setFileInfo] = useState({ name: "", icon: "", file: null });
+  const [fileInfo, setFileInfo] = useState<FileInfo>({
+    name: "",
+    icon: "",
+    file: null,
+  });
   const { setDocxXmlData, setDocxFilesData } = useDocxXmlStore();
   const { setFileName } = useFileNameStore();
   const navigate = useNavigate();
@@ -21,7 +36,9 @@ const useFileUpload = () => {
     if (fileInfo.file) {
       setFileName(fileInfo.name);
       try {
-        const { xmlData, docxFilesData } = await extractDocxData(fileInfo.file);
+        const { xmlData, docxFilesData }: ExtractedData = await extractDocxData(
+          fileInfo.file,
+        );
         setDocxXmlData(xmlData);
         localStorage.setItem("docxXmlData", xmlData);
 
