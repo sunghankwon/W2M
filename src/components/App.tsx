@@ -1,8 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 
 import Header from "./Header";
-import DocxUploader from "./DocxUploader";
-import MarkdownConvert from "./MarkdownConvert";
+import DocxUploader from "./DocxUploader/DocxUploader.jsx";
+import MarkdownConvert from "./MarkdownConvert/MarkdownConvert.jsx";
 
 const App = (): JSX.Element => {
   return (
