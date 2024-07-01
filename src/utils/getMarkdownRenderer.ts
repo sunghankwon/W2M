@@ -1,9 +1,13 @@
-import { marked } from "marked";
+import { marked, Renderer } from "marked";
 
-const getMarkdownRenderer = () => {
+const getMarkdownRenderer = (): Renderer => {
   const renderer = new marked.Renderer();
 
-  renderer.image = function (href, title, text) {
+  renderer.image = function (
+    href: string,
+    title: string,
+    text: string,
+  ): string {
     const isHttpUrl = href.startsWith("http://") || href.startsWith("https://");
     const isBase64Url = href.startsWith("data:image/");
 
