@@ -8,9 +8,14 @@ import useMarkdownTextStore from "../store/useMarkdownText";
 import printTextNodes from "../utils/printTextNodes";
 import transformQuotesInMarkdown from "../utils/transformQuotesInMarkdown";
 
+interface DocxFilesData {
+  [key: string]: string;
+}
+
 const useMarkdownConversion = () => {
-  const [originName, setOriginName] = useState("");
-  const [isDownloadTriggered, setIsDownloadTriggered] = useState(false);
+  const [originName, setOriginName] = useState<string>("");
+  const [isDownloadTriggered, setIsDownloadTriggered] =
+    useState<boolean>(false);
   const navigate = useNavigate();
   const { fileName } = useFileNameStore();
   const { docxXmlData, docxFilesData } = useDocxXmlStore();
@@ -23,7 +28,7 @@ const useMarkdownConversion = () => {
         try {
           let markdown = await printTextNodes(
             xmlDoc.documentElement,
-            docxFilesData,
+            docxFilesData as DocxFilesData,
           );
           markdown = await transformQuotesInMarkdown(markdown);
           setMarkdownText(markdown);
