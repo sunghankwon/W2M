@@ -1,8 +1,34 @@
-function getNumberingLevel(numPr, numberingMap, listItemCounters) {
+interface NumberingDefinition {
+  numFmt: string;
+}
+
+interface NumberingMap {
+  [numId: string]: {
+    [ilvl: string]: NumberingDefinition;
+  };
+}
+
+interface ListItemCounters {
+  [numId: string]: {
+    [ilvl: string]: number;
+  };
+}
+
+interface NumberingLevelResult {
+  numberingLevel: string;
+  isListItem: boolean;
+}
+
+function getNumberingLevel(
+  numPr: Element | null,
+  numberingMap: NumberingMap,
+  listItemCounters: ListItemCounters,
+): NumberingLevelResult {
   if (numPr) {
-    const numId = numPr
-      .getElementsByTagName("w:numId")[0]
-      .getAttribute("w:val");
+    const numIdElement = numPr.getElementsByTagName("w:numId")[0];
+    const numId = numIdElement ? numIdElement.getAttribute("w:val") : null;
+    if (!numId) return { numberingLevel: "", isListItem: false };
+
     const ilvlElement = numPr.getElementsByTagName("w:ilvl")[0];
     const ilvl = ilvlElement ? ilvlElement.getAttribute("w:val") : "0";
     const numberingDefinition =
