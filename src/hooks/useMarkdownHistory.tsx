@@ -1,11 +1,15 @@
-import { useRef } from "react";
+import { useRef, MutableRefObject } from "react";
 
-const useMarkdownHistory = (initialText, setMarkdownText, editorRef) => {
-  const historyRef = useRef([initialText]);
-  const historyIndexRef = useRef(0);
-  const lastEditPositionRef = useRef(0);
+const useMarkdownHistory = (
+  initialText: string,
+  setMarkdownText: (text: string) => void,
+  editorRef: MutableRefObject<HTMLTextAreaElement | null>,
+) => {
+  const historyRef = useRef<string[]>([initialText]);
+  const historyIndexRef = useRef<number>(0);
+  const lastEditPositionRef = useRef<number>(0);
 
-  const updateText = (newHistoryIndex) => {
+  const updateText = (newHistoryIndex: number) => {
     historyIndexRef.current = newHistoryIndex;
     const value = historyRef.current[newHistoryIndex];
     setMarkdownText(value);
@@ -32,7 +36,7 @@ const useMarkdownHistory = (initialText, setMarkdownText, editorRef) => {
     }
   };
 
-  const updateHistory = (newText, replaceLast = false) => {
+  const updateHistory = (newText: string, replaceLast = false) => {
     if (replaceLast) {
       historyRef.current[historyIndexRef.current] = newText;
     } else {
