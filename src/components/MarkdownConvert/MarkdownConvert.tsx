@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, UIEvent } from "react";
 import { syncScroll } from "../../utils/syncScroll";
 import useMarkdownConversion from "../../hooks/useMarkdownConversion";
 import MarkdownEditor from "../MarkdownEditor";
@@ -11,17 +11,17 @@ const MarkdownConvert = () => {
   const [iconSrc, setIconSrc] = useState(copyIcon);
   const { originName, markdownText, docxFilesData } = useMarkdownConversion();
 
-  const previewRef = useRef(null);
-  const editorRef = useRef(null);
-  const isProgrammaticScroll = useRef(false);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+  const isProgrammaticScroll = useRef<boolean>(false);
 
-  const handleEditorScroll = (event) => {
+  const handleEditorScroll = (event: UIEvent<HTMLTextAreaElement>) => {
     if (isProgrammaticScroll.current) return;
     isProgrammaticScroll.current = true;
     syncScroll(editorRef, previewRef, isProgrammaticScroll);
   };
 
-  const handlePreviewScroll = (event) => {
+  const handlePreviewScroll = (event: UIEvent<HTMLDivElement>) => {
     if (isProgrammaticScroll.current) return;
     isProgrammaticScroll.current = true;
     syncScroll(previewRef, editorRef, isProgrammaticScroll);
