@@ -1,28 +1,43 @@
-import { useEffect, useRef } from "react";
-
+import React, {
+  useEffect,
+  useRef,
+  RefObject,
+  ChangeEvent,
+  UIEvent,
+} from "react";
 import { Toolbar } from "../CustomTools/Toolbar";
 import useMarkdownTextStore from "../../store/useMarkdownText";
 import useMarkdownHistory from "../../hooks/useMarkdownHistory";
 import handleEditorScrollSync from "../../utils/handleEditorScrollSync";
 import handleKeyDown from "../../utils/handleKeyDown";
 
-function MarkdownEditor({
+interface MarkdownEditorProps {
+  handleEditorScroll: (event: UIEvent<HTMLTextAreaElement>) => void;
+  editorRef: RefObject<HTMLTextAreaElement>;
+  previewRef: RefObject<HTMLDivElement>;
+  isProgrammaticScroll: React.MutableRefObject<boolean>;
+}
+
+const MarkdownEditor = ({
   handleEditorScroll,
   editorRef,
   previewRef,
   isProgrammaticScroll,
-}) {
+}: MarkdownEditorProps) => {
   const { markdownText, setMarkdownText } = useMarkdownTextStore();
   const { undo, redo, updateHistory, lastEditPositionRef } = useMarkdownHistory(
     markdownText,
     setMarkdownText,
     editorRef,
   );
-  const isHistoryUpdating = useRef(false);
+  const isHistoryUpdating = useRef<boolean>(false);
 
   useEffect(() => {
     const textarea = editorRef.current;
-    const keyDownHandler = (event) => handleKeyDown(event, undo, redo);
+    if (!textarea) return;
+
+    const keyDownHandler = (event: KeyboardEvent) =>
+      handleKeyDown(event, undo, redo);
 
     textarea.addEventListener("keydown", keyDownHandler);
 
@@ -31,7 +46,7 @@ function MarkdownEditor({
     };
   }, [undo, redo, editorRef]);
 
-  const handleChange = (event) => {
+  const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = event.target.value;
     setMarkdownText(newValue);
     handleEditorScrollSync(
@@ -64,12 +79,12 @@ function MarkdownEditor({
         onChange={handleChange}
         onScroll={handleEditorScroll}
         ref={editorRef}
-        rows="23"
-        cols="80"
+        rows={23}
+        cols={80}
         className="p-2 mr-10 border border-gray-300 rounded-b-lg focus:border-gray-300 focus:outline-none editor-textarea"
       />
     </>
   );
-}
+};
 
 export default MarkdownEditor;
