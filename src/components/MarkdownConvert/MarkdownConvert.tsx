@@ -6,7 +6,7 @@ import Preview from "../Preview";
 import EditorToolbar from "./EditorToolbar";
 import copyIcon from "../../assets/copy.png";
 
-const MarkdownConvert = () => {
+const MarkdownConvert: React.FC = () => {
   const [buttonText, setButtonText] = useState("Copy Markdown");
   const [iconSrc, setIconSrc] = useState(copyIcon);
   const { originName, markdownText, docxFilesData } = useMarkdownConversion();
