@@ -1,4 +1,16 @@
-const FileConversionButtons = ({ handleConvert, fileInfo }) => (
+interface FileInfo {
+  file: File | null;
+}
+
+interface FileConversionButtonsProps {
+  handleConvert: () => void;
+  fileInfo: FileInfo;
+}
+
+const FileConversionButtons = ({
+  handleConvert,
+  fileInfo,
+}: FileConversionButtonsProps) => (
   <>
     <button
       className={`w-full text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold py-2 sm:py-3 md:py-4 rounded text-white ${
