@@ -1,11 +1,22 @@
+import React, { MutableRefObject } from "react";
 import useMarkdownTextStore from "../../store/useMarkdownText";
 import dividerLineIcon from "../../assets/line.png";
 
-export function DividerButton({ editorRef, updateHistory }) {
+interface DividerButtonProps {
+  editorRef: MutableRefObject<HTMLTextAreaElement | null>;
+  updateHistory: (newValue: string, isHistoryUpdating?: boolean) => void;
+}
+
+export function DividerButton({
+  editorRef,
+  updateHistory,
+}: DividerButtonProps): JSX.Element {
   const { markdownText, setMarkdownText } = useMarkdownTextStore();
 
   const applyDivider = () => {
     const textarea = editorRef.current;
+    if (!textarea) return;
+
     const startPos = textarea.selectionStart;
     const divider = "---\n";
 
