@@ -1,11 +1,24 @@
+import { MutableRefObject } from "react";
 import useMarkdownTextStore from "../../store/useMarkdownText";
 import headerIcon from "../../assets/header.png";
 
-export function HeaderButton({ editorRef, setCursorPosition, updateHistory }) {
+interface HeaderButtonProps {
+  editorRef: MutableRefObject<HTMLTextAreaElement | null>;
+  setCursorPosition: (pos: number) => void;
+  updateHistory: (newValue: string, isHistoryUpdating?: boolean) => void;
+}
+
+export function HeaderButton({
+  editorRef,
+  setCursorPosition,
+  updateHistory,
+}: HeaderButtonProps): JSX.Element {
   const { markdownText, setMarkdownText } = useMarkdownTextStore();
 
   const applyHeader = () => {
     const textarea = editorRef.current;
+    if (!textarea) return;
+
     const startPos = textarea.selectionStart;
     const textBeforeSelection = markdownText.substring(0, startPos);
     const indexOfLastNewLine = textBeforeSelection.lastIndexOf("\n");
@@ -14,12 +27,12 @@ export function HeaderButton({ editorRef, setCursorPosition, updateHistory }) {
     const currentLineText = markdownText.substring(
       startOfLine,
       markdownText.indexOf("\n", startPos) === -1
-        ? undefined
+        ? markdownText.length
         : markdownText.indexOf("\n", startPos),
     );
 
     const headerMatch = currentLineText.match(/^(#{1,6})\s/);
-    let newText;
+    let newText: string;
 
     updateHistory(markdownText);
 
