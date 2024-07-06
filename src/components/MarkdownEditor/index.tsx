@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useRef,
-  RefObject,
-  ChangeEvent,
-  UIEvent,
-} from "react";
+import { useEffect, useRef, RefObject, ChangeEvent, UIEvent } from "react";
 import { Toolbar } from "../CustomTools/Toolbar";
 import useMarkdownTextStore from "../../store/useMarkdownText";
 import useMarkdownHistory from "../../hooks/useMarkdownHistory";
