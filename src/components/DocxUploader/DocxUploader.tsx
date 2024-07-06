@@ -1,3 +1,4 @@
+import { DragEvent } from "react";
 import ConversionGuide from "../ConversionGuide";
 import useFileUpload from "../../hooks/useFileUpload";
 import FileInputLabel from "./FileInputLabel";
@@ -6,13 +7,14 @@ import docxImage from "../../assets/docx.png";
 import markdownImage from "../../assets/markdown.png";
 import processUploadedFile from "../../utils/processUploadedFile";
 
-const DocxUploader = () => {
+const DocxUploader = (): JSX.Element => {
   const { labelText, fileInfo, setFileInfo, setLabelText, handleConvert } =
     useFileUpload();
 
-  const handleDragOver = (event) => event.preventDefault();
+  const handleDragOver = (event: DragEvent<HTMLDivElement>) =>
+    event.preventDefault();
 
-  const handleDrop = (event) => {
+  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
     processUploadedFile(file, setFileInfo, setLabelText, docxImage);
