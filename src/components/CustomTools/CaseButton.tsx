@@ -1,5 +1,13 @@
-import React from "react";
+import { MutableRefObject } from "react";
 import useMarkdownTextStore from "../../store/useMarkdownText";
+
+interface CaseButtonProps {
+  editorRef: MutableRefObject<HTMLTextAreaElement | null>;
+  updateHistory: (newValue: string, isHistoryUpdating?: boolean) => void;
+  icon: string;
+  transformCase: (text: string) => string;
+  altText: string;
+}
 
 export function CaseButton({
   editorRef,
@@ -7,11 +15,13 @@ export function CaseButton({
   icon,
   transformCase,
   altText,
-}) {
+}: CaseButtonProps): JSX.Element {
   const { markdownText, setMarkdownText } = useMarkdownTextStore();
 
   const applyCaseTransform = () => {
     const textarea = editorRef.current;
+    if (!textarea) return;
+
     const startPos = textarea.selectionStart;
     const endPos = textarea.selectionEnd;
     const selectedText = markdownText.substring(startPos, endPos);
