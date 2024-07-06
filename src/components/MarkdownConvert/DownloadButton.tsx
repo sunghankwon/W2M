@@ -5,14 +5,14 @@ import downloadIcon from "../../assets/download.png";
 interface DownloadButtonProps {
   originName: string;
   markdownText: string;
-  docxFilesData: Record<string, string>;
+  docxFilesData: Record<string, string | Blob>;
 }
 
-const DownloadButton = ({
+const DownloadButton: React.FC<DownloadButtonProps> = ({
   originName,
   markdownText,
   docxFilesData,
-}: DownloadButtonProps) => {
+}) => {
   const downloadMarkdownFile = async () => {
     const hasImages = Object.keys(docxFilesData).some((key) =>
       key.startsWith("word/media/"),
@@ -23,7 +23,7 @@ const DownloadButton = ({
       zip.file(`${originName}.md`, markdownText);
       Object.entries(docxFilesData).forEach(([key, value]) => {
         if (key.startsWith("word/media/")) {
-          zip.file(key, value, { binary: true });
+          zip.file(key, value as Blob, { binary: true });
         }
       });
 
