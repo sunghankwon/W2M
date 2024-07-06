@@ -1,11 +1,24 @@
+import { MutableRefObject } from "react";
 import useMarkdownTextStore from "../../store/useMarkdownText";
 import tableIcon from "../../assets/table.png";
 
-export function TableButton({ editorRef, setCursorPosition, updateHistory }) {
+interface TableButtonProps {
+  editorRef: MutableRefObject<HTMLTextAreaElement | null>;
+  setCursorPosition: (pos: number) => void;
+  updateHistory: (newValue: string, isHistoryUpdating?: boolean) => void;
+}
+
+export function TableButton({
+  editorRef,
+  setCursorPosition,
+  updateHistory,
+}: TableButtonProps): JSX.Element {
   const { markdownText, setMarkdownText } = useMarkdownTextStore();
 
   const applyTable = () => {
     const textarea = editorRef.current;
+    if (!textarea) return;
+
     const startPos = textarea.selectionStart;
 
     const table = `| title1 | title2 | title3 |\n| ---- | ---- | ---- |\n| 1 | 2 | 3 |\n| a | b | c |\n| i | ii | iii |\n`;
