@@ -1,12 +1,33 @@
+import { ChangeEvent, MouseEvent } from "react";
 import fileSearchIcon from "../../assets/file.png";
 import docxImage from "../../assets/docx.png";
 import processUploadedFile from "../../utils/processUploadedFile";
 import clearSelection from "../../utils/clearSelection";
 
-const FileInputLabel = ({ fileInfo, labelText, setFileInfo, setLabelText }) => {
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    processUploadedFile(file, setFileInfo, setLabelText, docxImage);
+interface FileInfo {
+  name: string;
+  icon: string;
+  file: File | null;
+}
+
+interface FileInputLabelProps {
+  fileInfo: FileInfo;
+  labelText: string;
+  setFileInfo: (fileInfo: FileInfo) => void;
+  setLabelText: (labelText: string) => void;
+}
+
+const FileInputLabel = ({
+  fileInfo,
+  labelText,
+  setFileInfo,
+  setLabelText,
+}: FileInputLabelProps): JSX.Element => {
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      processUploadedFile(file, setFileInfo, setLabelText, docxImage);
+    }
   };
 
   return (
@@ -35,7 +56,7 @@ const FileInputLabel = ({ fileInfo, labelText, setFileInfo, setLabelText }) => {
             <span className="mt-2">{fileInfo.name}</span>
             <div
               className="absolute top-0 right-0 mt-2 mr-2 text-xl text-red-500 cursor-pointer"
-              onClick={(event) => {
+              onClick={(event: MouseEvent<HTMLDivElement>) => {
                 event.stopPropagation();
                 event.preventDefault();
                 clearSelection(setFileInfo, setLabelText);
