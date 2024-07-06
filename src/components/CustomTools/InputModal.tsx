@@ -1,7 +1,17 @@
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 
-export function InputModal({ isOpen, onClose, onConfirm }) {
-  const [url, setUrl] = useState("");
+interface InputModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (url: string) => void;
+}
+
+export function InputModal({
+  isOpen,
+  onClose,
+  onConfirm,
+}: InputModalProps): JSX.Element | null {
+  const [url, setUrl] = useState<string>("");
 
   const handleSubmit = () => {
     onConfirm(url);
@@ -11,6 +21,10 @@ export function InputModal({ isOpen, onClose, onConfirm }) {
 
   if (!isOpen) return null;
 
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setUrl(e.target.value);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-600 bg-opacity-50">
       <div className="absolute top-[300px] mt-[-100px] w-[300px] p-4 bg-white shadow-md rounded-lg">
@@ -19,7 +33,7 @@ export function InputModal({ isOpen, onClose, onConfirm }) {
           type="text"
           placeholder="http://"
           value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          onChange={handleChange}
           className="w-full p-2 border border-gray-300 rounded"
         />
         <div className="flex justify-end mt-4 space-x-2">
