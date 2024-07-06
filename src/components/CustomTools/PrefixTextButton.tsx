@@ -1,5 +1,15 @@
-import { useEffect } from "react";
+import React, { useEffect, MutableRefObject } from "react";
 import useMarkdownTextStore from "../../store/useMarkdownText";
+
+interface PrefixTextButtonProps {
+  editorRef: MutableRefObject<HTMLTextAreaElement | null>;
+  setCursorPosition: (pos: number) => void;
+  updateHistory: (newValue: string, isHistoryUpdating?: boolean) => void;
+  icon: string;
+  styleStart: string;
+  shortcutKey: string;
+  testId: string;
+}
 
 export function PrefixTextButton({
   editorRef,
@@ -9,11 +19,13 @@ export function PrefixTextButton({
   styleStart,
   shortcutKey,
   testId,
-}) {
+}: PrefixTextButtonProps): JSX.Element {
   const { markdownText, setMarkdownText } = useMarkdownTextStore();
 
   const applyStyle = () => {
     const textarea = editorRef.current;
+    if (!textarea) return;
+
     const startPos = textarea.selectionStart;
     const endPos = textarea.selectionEnd;
     const selectedText = markdownText.substring(startPos, endPos);
@@ -25,7 +37,7 @@ export function PrefixTextButton({
 
     if (selectedText) {
       const textArray = selectedText.split("\n");
-      for (let text of textArray) {
+      for (const text of textArray) {
         formattedText += `${styleStart}${text}\n`;
       }
 
@@ -61,7 +73,7 @@ export function PrefixTextButton({
     textarea.focus();
   };
 
-  const handleShortcuts = (event) => {
+  const handleShortcuts = (event: globalThis.KeyboardEvent) => {
     if ((event.metaKey || event.ctrlKey) && event.key === shortcutKey) {
       event.preventDefault();
       applyStyle();
@@ -69,10 +81,10 @@ export function PrefixTextButton({
   };
 
   useEffect(() => {
-    document.addEventListener("keydown", handleShortcuts);
+    document.addEventListener("keydown", handleShortcuts as EventListener);
 
     return () => {
-      document.removeEventListener("keydown", handleShortcuts);
+      document.removeEventListener("keydown", handleShortcuts as EventListener);
     };
   }, [markdownText]);
 
