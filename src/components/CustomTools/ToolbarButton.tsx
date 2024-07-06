@@ -1,3 +1,4 @@
+import { MutableRefObject } from "react";
 import { SurroundTextButton } from "./SurroundTextButton";
 import { PrefixTextButton } from "./PrefixTextButton";
 import { CaseButton } from "./CaseButton";
@@ -14,11 +15,21 @@ import lowercaseIcon from "../../assets/lowercase.png";
 import imageIcon from "../../assets/image.png";
 import linkIcon from "../../assets/link.png";
 
-export function BoldButton({ editorRef, setCursorPosition, updateHistory }) {
+interface ButtonProps {
+  editorRef: MutableRefObject<HTMLTextAreaElement | null>;
+  setCursorPosition?: (pos: number) => void;
+  updateHistory: (newValue: string, isHistoryUpdating?: boolean) => void;
+}
+
+export function BoldButton({
+  editorRef,
+  setCursorPosition,
+  updateHistory,
+}: ButtonProps) {
   return (
     <SurroundTextButton
       editorRef={editorRef}
-      setCursorPosition={setCursorPosition}
+      setCursorPosition={setCursorPosition!}
       updateHistory={updateHistory}
       icon={boldIcon}
       styleStart="**"
@@ -29,11 +40,15 @@ export function BoldButton({ editorRef, setCursorPosition, updateHistory }) {
   );
 }
 
-export function ItalicButton({ editorRef, setCursorPosition, updateHistory }) {
+export function ItalicButton({
+  editorRef,
+  setCursorPosition,
+  updateHistory,
+}: ButtonProps) {
   return (
     <SurroundTextButton
       editorRef={editorRef}
-      setCursorPosition={setCursorPosition}
+      setCursorPosition={setCursorPosition!}
       updateHistory={updateHistory}
       icon={italicIcon}
       styleStart="_"
@@ -48,11 +63,11 @@ export function StrikethroughButton({
   editorRef,
   setCursorPosition,
   updateHistory,
-}) {
+}: ButtonProps) {
   return (
     <SurroundTextButton
       editorRef={editorRef}
-      setCursorPosition={setCursorPosition}
+      setCursorPosition={setCursorPosition!}
       updateHistory={updateHistory}
       icon={strikethroughIcon}
       styleStart="~~"
@@ -67,11 +82,11 @@ export function UnderlineButton({
   editorRef,
   setCursorPosition,
   updateHistory,
-}) {
+}: ButtonProps) {
   return (
     <SurroundTextButton
       editorRef={editorRef}
-      setCursorPosition={setCursorPosition}
+      setCursorPosition={setCursorPosition!}
       updateHistory={updateHistory}
       icon={underlineIcon}
       styleStart="<u>"
@@ -82,11 +97,15 @@ export function UnderlineButton({
   );
 }
 
-export function TaskButton({ editorRef, setCursorPosition, updateHistory }) {
+export function TaskButton({
+  editorRef,
+  setCursorPosition,
+  updateHistory,
+}: ButtonProps) {
   return (
     <PrefixTextButton
       editorRef={editorRef}
-      setCursorPosition={setCursorPosition}
+      setCursorPosition={setCursorPosition!}
       updateHistory={updateHistory}
       icon={taskIcon}
       styleStart="- [ ] "
@@ -100,11 +119,11 @@ export function UnorderedListButton({
   editorRef,
   setCursorPosition,
   updateHistory,
-}) {
+}: ButtonProps) {
   return (
     <PrefixTextButton
       editorRef={editorRef}
-      setCursorPosition={setCursorPosition}
+      setCursorPosition={setCursorPosition!}
       updateHistory={updateHistory}
       icon={unorderedIcon}
       styleStart="- "
@@ -114,11 +133,15 @@ export function UnorderedListButton({
   );
 }
 
-export function QuoteButton({ editorRef, setCursorPosition, updateHistory }) {
+export function QuoteButton({
+  editorRef,
+  setCursorPosition,
+  updateHistory,
+}: ButtonProps) {
   return (
     <PrefixTextButton
       editorRef={editorRef}
-      setCursorPosition={setCursorPosition}
+      setCursorPosition={setCursorPosition!}
       updateHistory={updateHistory}
       icon={quoteIcon}
       styleStart="> "
@@ -128,50 +151,50 @@ export function QuoteButton({ editorRef, setCursorPosition, updateHistory }) {
   );
 }
 
-export function UpperCaseButton({ editorRef, updateHistory }) {
+export function UpperCaseButton({ editorRef, updateHistory }: ButtonProps) {
   return (
     <CaseButton
       editorRef={editorRef}
       updateHistory={updateHistory}
       icon={uppercaseIcon}
-      transformCase={(text) => text.toUpperCase()}
+      transformCase={(text: string) => text.toUpperCase()}
       altText="Uppercase"
     />
   );
 }
 
-export function LowerCaseButton({ editorRef, updateHistory }) {
+export function LowerCaseButton({ editorRef, updateHistory }: ButtonProps) {
   return (
     <CaseButton
       editorRef={editorRef}
       updateHistory={updateHistory}
       icon={lowercaseIcon}
-      transformCase={(text) => text.toLowerCase()}
+      transformCase={(text: string) => text.toLowerCase()}
       altText="Lowercase"
     />
   );
 }
 
-export function ImageButton({ editorRef, updateHistory }) {
+export function ImageButton({ editorRef, updateHistory }: ButtonProps) {
   return (
     <InsertButton
       editorRef={editorRef}
       updateHistory={updateHistory}
       icon={imageIcon}
       placeholder="Image"
-      markdownSyntax={(url) => `![](${url})`}
+      markdownSyntax={(url: string) => `![](${url})`}
     />
   );
 }
 
-export function LinkButton({ editorRef, updateHistory }) {
+export function LinkButton({ editorRef, updateHistory }: ButtonProps) {
   return (
     <InsertButton
       editorRef={editorRef}
       updateHistory={updateHistory}
       icon={linkIcon}
       placeholder="Link"
-      markdownSyntax={(url) => `[](${url})`}
+      markdownSyntax={(url: string) => `[](${url})`}
     />
   );
 }
