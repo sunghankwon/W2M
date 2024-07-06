@@ -4,14 +4,14 @@ import DownloadButton from "./DownloadButton";
 interface EditorToolbarProps {
   originName: string;
   markdownText: string;
-  docxFilesData: Record<string, string>;
+  docxFilesData: Record<string, string | Blob>;
   buttonText: string;
   setButtonText: React.Dispatch<React.SetStateAction<string>>;
   iconSrc: string;
   setIconSrc: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const EditorToolbar = ({
+const EditorToolbar: React.FC<EditorToolbarProps> = ({
   originName,
   markdownText,
   docxFilesData,
@@ -19,7 +19,7 @@ const EditorToolbar = ({
   setButtonText,
   iconSrc,
   setIconSrc,
-}: EditorToolbarProps) => (
+}) => (
   <div className="flex justify-between w-[706px] border rounded-t-md bg-gray-300 editor-toolbar">
     <span className="flex items-center flex-grow ml-4">markdown</span>
     <div className="flex">
