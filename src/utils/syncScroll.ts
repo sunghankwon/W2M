@@ -1,8 +1,8 @@
 import { MutableRefObject, RefObject } from "react";
 
 export const syncScroll = (
-  sourceRef: RefObject<HTMLDivElement>,
-  targetRef: RefObject<HTMLDivElement>,
+  sourceRef: RefObject<HTMLTextAreaElement | HTMLDivElement>,
+  targetRef: RefObject<HTMLTextAreaElement | HTMLDivElement>,
   isProgrammaticScroll: MutableRefObject<boolean>,
 ): void => {
   if (sourceRef.current && targetRef.current) {
