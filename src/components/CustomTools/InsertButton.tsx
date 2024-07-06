@@ -1,6 +1,14 @@
-import { useState } from "react";
+import { useState, MutableRefObject } from "react";
 import { InputModal } from "./InputModal";
 import useMarkdownTextStore from "../../store/useMarkdownText";
+
+interface InsertButtonProps {
+  editorRef: MutableRefObject<HTMLTextAreaElement | null>;
+  updateHistory: (newValue: string, isHistoryUpdating?: boolean) => void;
+  icon: string;
+  placeholder: string;
+  markdownSyntax: (url: string) => string;
+}
 
 export function InsertButton({
   editorRef,
@@ -8,12 +16,14 @@ export function InsertButton({
   icon,
   placeholder,
   markdownSyntax,
-}) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+}: InsertButtonProps): JSX.Element {
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { markdownText, setMarkdownText } = useMarkdownTextStore();
 
-  const applyInsert = (url) => {
+  const applyInsert = (url: string) => {
     const textarea = editorRef.current;
+    if (!textarea) return;
+
     const startPos = textarea.selectionStart;
 
     updateHistory(markdownText);
