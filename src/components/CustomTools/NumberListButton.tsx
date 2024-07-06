@@ -1,20 +1,29 @@
+import { MutableRefObject } from "react";
 import useMarkdownTextStore from "../../store/useMarkdownText";
 import numberIcon from "../../assets/number.png";
+
+interface NumberListButtonProps {
+  editorRef: MutableRefObject<HTMLTextAreaElement | null>;
+  setCursorPosition: (pos: number) => void;
+  updateHistory: (newValue: string, isHistoryUpdating?: boolean) => void;
+}
 
 export function NumberListButton({
   editorRef,
   setCursorPosition,
   updateHistory,
-}) {
+}: NumberListButtonProps): JSX.Element {
   const { markdownText, setMarkdownText } = useMarkdownTextStore();
 
   const applyNumbering = () => {
     const textarea = editorRef.current;
+    if (!textarea) return;
+
     const startPos = textarea.selectionStart;
     const endPos = textarea.selectionEnd;
     const selectedText = markdownText.substring(startPos, endPos);
 
-    let newText;
+    let newText: string;
     let numberText = "";
 
     updateHistory(markdownText);
@@ -22,7 +31,7 @@ export function NumberListButton({
     if (selectedText) {
       const textArray = selectedText.split("\n");
       let number = 0;
-      for (let text of textArray) {
+      for (const text of textArray) {
         number++;
         const headerMatch = text.match(/^(#+)(\s)?/);
         if (headerMatch) {
@@ -81,7 +90,7 @@ export function NumberListButton({
       onClick={applyNumbering}
       className="p-2 border rounded-lg hover:bg-gray-200"
     >
-      <img src={numberIcon} className="h-5"></img>
+      <img src={numberIcon} alt="Number List" className="h-5" />
     </button>
   );
 }
