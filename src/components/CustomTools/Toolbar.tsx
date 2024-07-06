@@ -1,3 +1,4 @@
+import { MutableRefObject } from "react";
 import { HeaderButton } from "./HeaderButton";
 import {
   BoldButton,
@@ -19,10 +20,20 @@ import { TableButton } from "./TableButton";
 import { DividerButton } from "./DividerButton";
 import { FullScreenButton } from "./FullScreenButton";
 
-export function Toolbar({ editorRef, updateHistory }) {
-  const setCursorPosition = (pos) => {
+interface ToolbarProps {
+  editorRef: MutableRefObject<HTMLTextAreaElement | null>;
+  updateHistory: (newValue: string, isHistoryUpdating?: boolean) => void;
+}
+
+export function Toolbar({
+  editorRef,
+  updateHistory,
+}: ToolbarProps): JSX.Element {
+  const setCursorPosition = (pos: number) => {
     const textarea = editorRef.current;
-    textarea.setSelectionRange(pos, pos);
+    if (textarea) {
+      textarea.setSelectionRange(pos, pos);
+    }
   };
 
   return (
@@ -61,7 +72,11 @@ export function Toolbar({ editorRef, updateHistory }) {
         updateHistory={updateHistory}
       />
       <DividerButton editorRef={editorRef} updateHistory={updateHistory} />
-      <CodeBlockButton editorRef={editorRef} updateHistory={updateHistory} />
+      <CodeBlockButton
+        editorRef={editorRef}
+        setCursorPosition={setCursorPosition}
+        updateHistory={updateHistory}
+      />
       <LinkButton editorRef={editorRef} updateHistory={updateHistory} />
       <CapitalizeButton editorRef={editorRef} updateHistory={updateHistory} />
       <UpperCaseButton editorRef={editorRef} updateHistory={updateHistory} />
@@ -82,7 +97,11 @@ export function Toolbar({ editorRef, updateHistory }) {
         updateHistory={updateHistory}
       />
       <ImageButton editorRef={editorRef} updateHistory={updateHistory} />
-      <TableButton editorRef={editorRef} updateHistory={updateHistory} />
+      <TableButton
+        editorRef={editorRef}
+        setCursorPosition={setCursorPosition}
+        updateHistory={updateHistory}
+      />
       <FullScreenButton />
     </div>
   );
