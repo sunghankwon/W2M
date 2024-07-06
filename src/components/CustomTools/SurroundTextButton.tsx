@@ -1,5 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, MutableRefObject } from "react";
 import useMarkdownTextStore from "../../store/useMarkdownText";
+
+interface SurroundTextButtonProps {
+  editorRef: MutableRefObject<HTMLTextAreaElement | null>;
+  setCursorPosition: (pos: number) => void;
+  updateHistory: (newValue: string, isHistoryUpdating?: boolean) => void;
+  icon: string;
+  styleStart: string;
+  styleEnd: string;
+  shortcutKey: string;
+  testId: string;
+}
 
 export function SurroundTextButton({
   editorRef,
@@ -10,19 +21,21 @@ export function SurroundTextButton({
   styleEnd,
   shortcutKey,
   testId,
-}) {
+}: SurroundTextButtonProps): JSX.Element {
   const { markdownText, setMarkdownText } = useMarkdownTextStore();
 
   const applyStyle = () => {
     const textarea = editorRef.current;
+    if (!textarea) return;
+
     let startPos = textarea.selectionStart;
     let endPos = textarea.selectionEnd;
     const textBefore = markdownText.substring(0, startPos);
     const textAfter = markdownText.substring(endPos);
     let selectedText = markdownText.substring(startPos, endPos);
 
-    const leadingSpaces = selectedText.match(/^(\s*)/)[0];
-    const trailingSpaces = selectedText.match(/(\s*)$/)[0];
+    const leadingSpaces = selectedText.match(/^(\s*)/)?.[0] ?? "";
+    const trailingSpaces = selectedText.match(/(\s*)$/)?.[0] ?? "";
     selectedText = selectedText.trim();
 
     let newText;
@@ -98,7 +111,7 @@ export function SurroundTextButton({
     textarea.focus();
   };
 
-  const handleShortcuts = (event) => {
+  const handleShortcuts = (event: KeyboardEvent) => {
     if ((event.metaKey || event.ctrlKey) && event.key === shortcutKey) {
       event.preventDefault();
       applyStyle();
